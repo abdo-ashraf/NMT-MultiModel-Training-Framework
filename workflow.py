@@ -1,4 +1,4 @@
-from Parameters_Classes import DataParams, TokenizerParams, ModelParams
+from utils.Parameters_Classes import DataParams, TokenizerParams, ModelParams
 from train import train
 import os
 import argparse

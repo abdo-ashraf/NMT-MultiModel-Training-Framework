@@ -1,13 +1,12 @@
-from seq2seq_model import Seq2seq_no_attention
-from seq2seqAttention_model import Seq2seq_with_attention
-from Transformer_model import NMT_Transformer
-from data_utils import load_train_valid, tokenizers_train
+from models.seq2seq_model import Seq2seq_no_attention
+from models.seq2seqAttention_model import Seq2seq_with_attention
+from models.Transformer_model import NMT_Transformer
+from utils.data_utils import load_train_valid, tokenizers_train, Callable_tokenizer
+from utils.model_utils import loss_acc_loader, training, get_parameters_info, plot_loss
+from utils.Parameters_Classes import DataParams, TokenizerParams, ModelParams 
 import pandas as pd
 import torch
 from torch import nn
-from model_utils import loss_acc_loader, training, get_parameters_info, plot_loss
-from Parameters_Classes import DataParams, TokenizerParams, ModelParams 
-from data_utils import Callable_tokenizer
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
 ## Tokenizer params: src_vocab_size, trg_vocab_size, out_dir, lang1_model_prefix, lang2_model_prefix, lang1_character_coverage, lang2_character_coverage
