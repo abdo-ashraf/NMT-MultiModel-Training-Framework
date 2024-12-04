@@ -1,6 +1,6 @@
 import argparse
 import sys
-from make_data.data import make_data
+from data_make import make_data
 
 
 #####-----Parameters-----#####
@@ -25,10 +25,7 @@ def parse_arguments():
 if __name__ == '__main__':
     # Argument parsing and validation
     parser = parse_arguments()
-    if len(sys.argv) > 1:
-        args = parser.parse_args()
-    else:
-        parser.error("No argument provided!")
+    args = parser.parse_args()
 
     # Call the function with the parsed arguments
     df_train, df_valid, df_test = make_data(args.out_dir, args.data, args.valid_test_split, args.seed)
