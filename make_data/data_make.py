@@ -73,7 +73,7 @@ def pre_plot(plots_dir, df_data):
     # Close the plot to prevent it from displaying
     plt.close(fig)
 
-def drop(df_data):
+def drop(df_data, maxlen):
     ### Personal effort (No Reference)
     indices_to_drop = []
 
@@ -81,8 +81,8 @@ def drop(df_data):
                     (df_data['source_lang_length'] == 1)]).index
     indices_to_drop += list(idx)
 
-    idx = df_data[(df_data['source_lang_length'] > 20) | 
-                    (df_data['target_lang_length'] > 20)].index
+    idx = df_data[(df_data['source_lang_length'] > maxlen) | 
+                    (df_data['target_lang_length'] > maxlen)].index
     indices_to_drop += list(idx)
 
     idx = (df_data[(df_data['target_lang_length'].isin([2])) & 
@@ -139,12 +139,12 @@ def post_plot(plots_dir, filtered_data):
     # Close the plot to prevent it from displaying
     plt.close(fig)
 
-def make_data(out_dir, data_type='both', valid_test_split=0.4, seed=123):
+def make_data(out_dir, data_type, maxlen, valid_test_split, seed):
 
     data_out_dir = os.path.join(out_dir, 'data')
-    os.makedirs(plots_out_dir, exist_ok=True)
-    plots_out_dir = os.path.join(out_dir, 'plots')
     os.makedirs(data_out_dir, exist_ok=True)
+    plots_out_dir = os.path.join(out_dir, 'plots')
+    os.makedirs(plots_out_dir, exist_ok=True)
 
     df_data = download_data(data_type)
     df_data['source_lang'] = df_data['source_lang'].apply(clean_en)
@@ -154,7 +154,7 @@ def make_data(out_dir, data_type='both', valid_test_split=0.4, seed=123):
     if os.path.exists(str(plots_out_dir)):
         pre_plot(plots_out_dir, df_data)
 
-    filtered_data = drop(df_data)
+    filtered_data = drop(df_data, maxlen)
 
     if os.path.exists(str(plots_out_dir)):
         post_plot(plots_out_dir, filtered_data)
