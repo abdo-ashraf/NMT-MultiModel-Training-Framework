@@ -24,14 +24,14 @@ class DataParams():
         self.num_workers = num_workers
 
         assert isinstance(seed, int), f"seed must be Integer"
-        self.generator = Generator.manual_seed(seed)
+        self.generator = Generator().manual_seed(seed)
 
         assert device in ['cuda', 'cpu'], f"device should be 'cuda' or 'cpu'"
         self.device = device
 
         assert isinstance(out_dir, str), f"out_dir must be String"
         self.out_dir = os.path.join(out_dir, 'plots')
-        if os.path.exists(self.out_dir):
+        if not os.path.exists(self.out_dir):
             print(f"{self.out_dir} does not exists")
             print(f'Making dirs tree @{self.out_dir}...')
             os.makedirs(self.out_dir, exist_ok=True)
@@ -106,7 +106,7 @@ class ModelParams():
 
         assert isinstance(out_dir, str), f"out_dir must be String"
         self.out_dir = os.path.join(out_dir, 'models')
-        if os.path.exists(self.out_dir):
+        if not os.path.exists(self.out_dir):
             print(f"{self.out_dir} does not exists")
             print(f'Making dirs tree @{self.out_dir}...')
             os.makedirs(self.out_dir, exist_ok=True)

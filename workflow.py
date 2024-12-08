@@ -15,7 +15,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Argument Parser for Your Program')
 
     parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for train')
-    parser.add_argument('--valid_csv_path', type=int, required=True, help='CSV of columns "source_lang" and "target_lang" for validation')
+    parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for validation')
     parser.add_argument('--src_vocab_size', type=int, required=True, help='Needed vocabulary size for source')
     parser.add_argument('--trg_vocab_size', type=int, required=True, help='Needed vocabulary size for target')
     parser.add_argument('--out_dir', required=True, help='Working dir')
@@ -53,13 +53,9 @@ if __name__ == '__main__':
     else:
         parser.error("No argument provided!")
 
-    assert os.access(args.outdir, os.W_OK), f"{args.outdir} : Output Directory has to be writable"
-    
-    for dir in args.train_csv_path:
-        assert os.path.exists(dir), f"{dir} : Train csv not found."
-
-    for dir in args.valid_csv_path:
-        assert os.path.exists(dir), f"{dir} : Valid csv not found."
+    assert os.access(args.out_dir, os.W_OK), f"{args.out_dir} : Output Directory has to be writable"
+    assert os.path.exists(args.train_csv_path), f"{args.train_csv_path} : Train csv not found."
+    assert os.path.exists(args.valid_csv_path), f"{args.valid_csv_path} : Valid csv not found."
     
     # Call the function with the parsed arguments
     dp = DataParams(args.train_csv_path, args.valid_csv_path, args.batch_size, args.num_workers, args.seed, args.device, args.out_dir, args.maxlen)

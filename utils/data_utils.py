@@ -2,8 +2,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import sentencepiece as spm
 from torch import nn
-import os
-from Parameters_Classes import DataParams, TokenizerParams 
+from utils.Parameters_Classes import DataParams, TokenizerParams 
 ## requirements
 # !pip -q install sentencepiece
 
