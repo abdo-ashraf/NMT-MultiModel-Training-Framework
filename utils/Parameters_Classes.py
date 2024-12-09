@@ -53,7 +53,7 @@ class TokenizerParams():
 
         assert isinstance(out_dir, str), f"out_dir must be String"
         self.out_dir = os.path.join(out_dir, 'tokenizers')
-        if os.path.exists(self.out_dir):
+        if not os.path.exists(self.out_dir):
             print(f"{self.out_dir} does not exists")
             print(f'Making dirs tree @{self.out_dir}...')
             os.makedirs(self.out_dir, exist_ok=True)

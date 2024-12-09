@@ -110,8 +110,8 @@ class MYCollate():
 
 
 def load_train_valid(train_sentences, valid_sentences, tokenizer_params:TokenizerParams, data_params:DataParams):
-    src_tokenizer = Callable_tokenizer(tokenizer_params.lang1_model_path)
-    trg_tokenizer = Callable_tokenizer(tokenizer_params.lang2_model_path)
+    src_tokenizer = Callable_tokenizer(tokenizer_params.lang1_model_path + '.model')
+    trg_tokenizer = Callable_tokenizer(tokenizer_params.lang2_model_path + '.model')
 
     train_ds = MT_Dataset(src_sentences_list=train_sentences[0], trg_sentences_list=train_sentences[1],
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)

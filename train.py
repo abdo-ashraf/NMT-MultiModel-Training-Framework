@@ -28,7 +28,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
                                                 data_params=data_params)
   print("Data Loading Done.")
 
-  src_tokenizer = Callable_tokenizer(tokenizer_params.lang1_model_path)
+  src_tokenizer = Callable_tokenizer(tokenizer_params.lang1_model_path + '.model')
   src_pad_tokenId = src_tokenizer.get_tokenId('<pad>')
   
   print("Starting Model Loading...")
@@ -36,6 +36,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
                                                         decoder_vocab_size=tokenizer_params.trg_vocab_size,
                                                         dim_embed=model_params.dim_embed,
                                                         dim_model=model_params.dim_model,
+                                                        dim_feedforward=model_params.dim_feedforward,
                                                         num_layers=model_params.num_layers,
                                                         dropout_probability=model_params.dropout)
       
@@ -43,6 +44,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
                                                                                  decoder_vocab_size=tokenizer_params.trg_vocab_size,
                                                                                  dim_embed=model_params.dim_embed,
                                                                                  dim_model=model_params.dim_model,
+                                                                                 dim_feedforward=model_params.dim_feedforward,
                                                                                  num_layers=model_params.num_layers,
                                                                                  dropout_probability=model_params.dropout)
 
@@ -50,6 +52,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
                                 decoder_vocab_size=tokenizer_params.trg_vocab_size,
                                 dim_embed=model_params.dim_embed,
                                 dim_model=model_params.dim_model,
+                                dim_feedforward=model_params.dim_feedforward,
                                 num_layers=model_params.num_layers,
                                 dropout_probability=model_params.dropout,
                                 src_pad_tokenId=src_pad_tokenId,
