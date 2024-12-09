@@ -1,5 +1,6 @@
-from utils.Parameters_Classes import DataParams, TokenizerParams, ModelParams
-from train import train
+from utils.Data_Parameters import DataParams
+from make_model.Model_Parameters import ModelParams
+from train import train_model
 import os
 import argparse
 import sys
@@ -16,8 +17,8 @@ def parse_arguments():
 
     parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for train')
     parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for validation')
-    parser.add_argument('--src_vocab_size', type=int, required=True, help='Needed vocabulary size for source')
-    parser.add_argument('--trg_vocab_size', type=int, required=True, help='Needed vocabulary size for target')
+    parser.add_argument('--src_tokenizer_path', type=str, required=True, help='Path of source tokenizer model')
+    parser.add_argument('--trg_tokenizer_path', type=str, required=True, help='Path of target tokenizer model')
     parser.add_argument('--out_dir', required=True, help='Working dir')
     parser.add_argument('--model_type', choices=['s2s', 's2sAttention', 'transformer'], required=True, help='needed model architecture')
 
@@ -25,11 +26,6 @@ def parse_arguments():
     parser.add_argument('--num_workers', type=int, default=DEFAULT_NUM_WORKERS, help='number of workers for dataloader')
     parser.add_argument('--seed', type=int, default=DEFAULT_SEED, help='Random seed')
     parser.add_argument('--maxlen', type=int, default=DEFAULT_MAXLEN, help='Maximum length of input sequence')
-
-    parser.add_argument('--lang1_model_prefix', type=str, default=DEFAULT_LANG1_MODEL_PREFIX, help='A prefix for source tokenizer name')
-    parser.add_argument('--lang2_model_prefix', type=str, default=DEFAULT_LANG2_MODEL_PREFIX, help='A prefix for target tokenizer name')
-    parser.add_argument('--lang1_character_coverage', type=float, default=DEFAULT_LANG1_CHARACTER_COVERAGE, help='source character coverage')
-    parser.add_argument('--lang2_character_coverage', type=float, default=DEFAULT_LANG2_CHARACTER_COVERAGE, help='target character coverage')
 
     parser.add_argument('--epochs', type=int, default=DEFAULT_EPOCHS, help='number of training epochs')
     parser.add_argument('--dim_embed', type=int, default=DEFAULT_DIM_EMBED, help='dims of embedding matrix')
@@ -44,7 +40,6 @@ def parse_arguments():
     return parser
  
 
-
 if __name__ == '__main__':
     # Argument parsing and validation
     parser = parse_arguments()
@@ -53,15 +48,34 @@ if __name__ == '__main__':
     else:
         parser.error("No argument provided!")
 
-    if not os.path.exists(args.out_dir): os.makedirs(args.out_dir, exist_ok=True)
     assert os.path.exists(args.train_csv_path), f"{args.train_csv_path} : Train csv not found."
     assert os.path.exists(args.valid_csv_path), f"{args.valid_csv_path} : Valid csv not found."
+    assert os.path.exists(args.src_tokenizer_path), f"{args.src_tokenizer_path} : Tokenizer.model not found."
+    assert os.path.exists(args.trg_tokenizer_path), f"{args.trg_tokenizer_path} : Tokenizer.model not found."
+    if not os.path.exists(args.out_dir): os.makedirs(args.out_dir, exist_ok=True)
     
     # Call the function with the parsed arguments
-    dp = DataParams(args.train_csv_path, args.valid_csv_path, args.batch_size, args.num_workers, args.seed, args.device, args.out_dir, args.maxlen)
-    tp = TokenizerParams(args.src_vocab_size, args.trg_vocab_size, args.out_dir, args.lang1_model_prefix, args.lang2_model_prefix, args.lang1_character_coverage, args.lang2_character_coverage)
-    mp = ModelParams(args.model_type, args.epochs, args.dim_embed, args.dim_model, args.dim_feedforward, args.num_layers, args.dropout, args.learning_rate, args.weight_decay, args.out_dir)
-    model, optim, criterion = train(dp, tp, mp)
+    dp = DataParams(train_csv_path=args.train_csv_path,
+                    valid_csv_path=args.valid_csv_path,
+                    epochs=args.epochs,
+                    batch_size=args.batch_size,
+                    num_workers=args.num_workers,
+                    seed=args.seed,
+                    device=args.device,
+                    out_dir=args.out_dir,
+                    maxlen=args.maxlen)
+    
+    mp = ModelParams(model_type=args.model_type,
+                     dim_embed=args.dim_embed,
+                     dim_model=args.dim_model,
+                     dim_feedforward=args.dim_feedforward,
+                     num_layers=args.num_layers,
+                     dropout=args.dropout,
+                     learning_rate=args.learning_rate,
+                     weight_decay=args.weight_decay,
+                     out_dir=args.out_dir)
+    
+    model, optim, criterion = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
     
     # if True == args.convert_onnx:
     #     print("Converting To ONNX framework...")

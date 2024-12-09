@@ -2,39 +2,9 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import sentencepiece as spm
 from torch import nn
-from utils.Parameters_Classes import DataParams, TokenizerParams 
+from utils.Data_Parameters import DataParams 
 ## requirements
 # !pip -q install sentencepiece
-
-
-def tokenizers_train(lang1_sentences, lang2_sentences, params:TokenizerParams):
-
-    spm.SentencePieceTrainer.train(
-        sentence_iterator=iter(lang1_sentences),
-        model_prefix=params.lang1_model_path, ## Prefix for saved model files
-        vocab_size=params.src_vocab_size,
-        character_coverage=params.lang1_character_coverage,
-        model_type="bpe",        ## Using Byte Pair Encoding (BPE) model for subword tokenization
-        pad_id=0,                ## ID for <pad> (pad token)
-        unk_id=1,                ## ID for <unk> (unknown token)
-        bos_id=2,                ## ID for <s> (beginning of sentence token)
-        eos_id=3                 ## ID for </s> (end of sentence token)
-    )
-    print(f'{params.lang1_model_path} Done')
-
-    spm.SentencePieceTrainer.train(
-        sentence_iterator=iter(lang2_sentences), 
-        model_prefix=params.lang2_model_path,
-        vocab_size=params.trg_vocab_size,
-        character_coverage=params.lang2_character_coverage,
-        model_type="bpe",
-        pad_id=0,
-        unk_id=1,
-        bos_id=2,
-        eos_id=3
-    )
-    print(f'{params.lang2_model_path} Done')
-
 
 
 ## Tokenizer
@@ -109,10 +79,8 @@ class MYCollate():
         return padded_en_stentences, padded_ar_stentences
 
 
-def load_train_valid(train_sentences, valid_sentences, tokenizer_params:TokenizerParams, data_params:DataParams):
-    src_tokenizer = Callable_tokenizer(tokenizer_params.lang1_model_path + '.model')
-    trg_tokenizer = Callable_tokenizer(tokenizer_params.lang2_model_path + '.model')
-
+def load_train_valid(train_sentences, valid_sentences, data_params:DataParams, src_tokenizer:Callable_tokenizer, trg_tokenizer:Callable_tokenizer):
+    
     train_ds = MT_Dataset(src_sentences_list=train_sentences[0], trg_sentences_list=train_sentences[1],
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     

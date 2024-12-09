@@ -1,5 +1,4 @@
 import argparse
-import sys
 from data_make import make_data
 
 
