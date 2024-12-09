@@ -53,7 +53,7 @@ if __name__ == '__main__':
     else:
         parser.error("No argument provided!")
 
-    assert os.access(args.out_dir, os.W_OK), f"{args.out_dir} : Output Directory has to be writable"
+    if not os.path.exists(args.out_dir): os.makedirs(args.out_dir, exist_ok=True)
     assert os.path.exists(args.train_csv_path), f"{args.train_csv_path} : Train csv not found."
     assert os.path.exists(args.valid_csv_path), f"{args.valid_csv_path} : Valid csv not found."
     

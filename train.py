@@ -30,7 +30,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
 
   src_pad_tokenId = Callable_tokenizer(tokenizer_params.lang1_model_path + '.model').get_tokenId('<pad>')
   
-  print("Starting Model Loading...")
+  print(f"Start Loading {model_params.model_type} Model...")
   if model_params.model_type == 's2s': model = Seq2seq_no_attention(encoder_vocab_size=tokenizer_params.src_vocab_size,
                                                         decoder_vocab_size=tokenizer_params.trg_vocab_size,
                                                         dim_embed=model_params.dim_embed,
