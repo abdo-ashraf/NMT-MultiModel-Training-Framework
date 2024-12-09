@@ -30,11 +30,11 @@ class DataParams():
         self.device = device
 
         assert isinstance(out_dir, str), f"out_dir must be String"
-        self.out_dir = os.path.join(out_dir, 'plots')
-        if not os.path.exists(self.out_dir):
-            print(f"{self.out_dir} does not exists")
-            print(f'Making dirs tree @{self.out_dir}...')
-            os.makedirs(self.out_dir, exist_ok=True)
+        self.plots_dir = os.path.join(out_dir, 'plots')
+        if not os.path.exists(self.plots_dir):
+            print(f"{self.plots_dir} does not exists")
+            print(f'Making dirs tree @{self.plots_dir}...')
+            os.makedirs(self.plots_dir, exist_ok=True)
             print('Done.')
 
         assert isinstance(maxlen, int), f"maxlen must be Integer"

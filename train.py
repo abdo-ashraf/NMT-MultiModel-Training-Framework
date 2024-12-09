@@ -28,8 +28,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
                                                 data_params=data_params)
   print("Data Loading Done.")
 
-  src_tokenizer = Callable_tokenizer(tokenizer_params.lang1_model_path + '.model')
-  src_pad_tokenId = src_tokenizer.get_tokenId('<pad>')
+  src_pad_tokenId = Callable_tokenizer(tokenizer_params.lang1_model_path + '.model').get_tokenId('<pad>')
   
   print("Starting Model Loading...")
   if model_params.model_type == 's2s': model = Seq2seq_no_attention(encoder_vocab_size=tokenizer_params.src_vocab_size,
@@ -74,7 +73,7 @@ def train(data_params:DataParams, tokenizer_params:TokenizerParams, model_params
                                                   valid_loader=valid_loader, epochs=model_params.epochs, device=data_params.device)
   print("Model Training Done.")
 
-  plot_loss(train_class_losses, val_class_losses, data_params.plots_dir)
+  plot_loss(train_class_losses, val_class_losses, data_params.plots_dir, model_params.model_type)
 
   return model, optim, class_criterion
 

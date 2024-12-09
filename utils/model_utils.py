@@ -103,7 +103,7 @@ def training(model, criterion, optimizer, train_loader, valid_loader, epochs, de
     return train_class_losses, val_class_losses
 
 
-def plot_loss(train_class_losses, val_class_losses, plots_dir):
+def plot_loss(train_class_losses, val_class_losses, plots_dir, model_type):
 
     fig = plt.figure(figsize=(8, 3))
     epochs = [ep + 1 for ep in range(len(train_class_losses))]
@@ -112,7 +112,7 @@ def plot_loss(train_class_losses, val_class_losses, plots_dir):
     plt.xlabel("Epochs")
     plt.ylabel("Loss")
     plt.legend()  # Add a legend to differentiate the lines
-    plot_path = os.path.join(plots_dir, 'loss.png')
+    plot_path = os.path.join(plots_dir, f'losses_{model_type}.png')
     plt.savefig(plot_path, dpi=300)
     # Close the plot to prevent it from displaying
     plt.close(fig)
