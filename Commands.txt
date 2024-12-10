@@ -1,5 +1,5 @@
-python ./make_data/data_workflow.py --out_dir './out/' --maxlen 30 --valid_test_split 0.3
+python ./make_data/data_workflow.py --out_dir './out/' --data 'both' --maxlen 30 --seed 123 --valid_test_split 0.3
 
 python ./make_tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/df_train.csv --src_vocab_size 16000 --trg_vocab_size 20000 --out_dir './out/' --lang1_model_prefix 'eng_tokenizer' --lang2_model_prefix 'ara_tokenizer' --lang1_character_coverage 0.995 --lang2_character_coverage 0.999
 
-python ./workflow.py  --train_csv_path './out/data/df_train.csv' --valid_csv_path './out/data/df_valid.csv' --src_tokenizer_path './out/tokenizers/eng_tokenizer.model' --trg_tokenizer_path './out/tokenizers/ara_tokenizer.model' --out_dir './out/' --model_type 's2s' --batch_size 64 --num_workers 2 --seed 123 --maxlen 30 --epochs 2 --dim_embed 64 --dim_model 64 --dim_feedforward 256 --num_layers 2 --dropout 0.3 --learning_rate 0.001 --weight_decay 0.0001 --device 'cuda'
+python ./workflow.py --train_csv_path './out/data/df_train.csv' --valid_csv_path './out/data/df_valid.csv' --src_tokenizer_path './out/tokenizers/eng_tokenizer.model' --trg_tokenizer_path './out/tokenizers/ara_tokenizer.model' --out_dir './out/' --model_type 's2s' --batch_size 64 --num_workers 2 --seed 123 --maxlen 30 --epochs 2 --dim_embed 64 --dim_model 64 --dim_feedforward 256 --num_layers 2 --dropout 0.3 --learning_rate 0.001 --weight_decay 0.0001 --device 'cuda'

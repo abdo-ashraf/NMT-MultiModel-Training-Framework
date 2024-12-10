@@ -16,9 +16,11 @@ def train_model(data_params:DataParams, model_params:ModelParams, src_tokenizer_
   df_train = pd.read_csv(data_params.train_csv_path)
   df_valid = pd.read_csv(data_params.valid_csv_path)
 
+  print("Starting Tokenizers Loading...")
   src_tokenizer = Callable_tokenizer(src_tokenizer_path)
   trg_tokenizer = Callable_tokenizer(trg_tokenizer_path)
   src_pad_tokenId = src_tokenizer.get_tokenId('<pad>')
+  print("Tokenizers Loading Done.")
 
   print("Starting Data Loading...")
   train_loader, valid_loader = load_train_valid(train_sentences=(df_train['source_lang'], df_train['target_lang']),
@@ -47,10 +49,4 @@ def train_model(data_params:DataParams, model_params:ModelParams, src_tokenizer_
 
   plot_loss(train_class_losses, val_class_losses, data_params.plots_dir, model_params.model_type)
 
-  return model, optim, class_criterion
-
-
-
-
-def testing(test_csv_path, model):
-  pass
+  return model

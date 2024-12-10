@@ -5,6 +5,7 @@ import os
 import argparse
 import sys
 from config import *
+import torch
 # import onnx
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
@@ -75,12 +76,11 @@ if __name__ == '__main__':
                      weight_decay=args.weight_decay,
                      out_dir=args.out_dir)
     
-    model, optim, criterion = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    model = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    ## Save Entire Model
+    torch.save(model, f"{mp.out_dir}_{mp.model_type}.bin")
     
     # if True == args.convert_onnx:
     #     print("Converting To ONNX framework...")
-    #     loaded_model = build_cnn(image_width=args.image_width, image_height=args.image_height,
-    #                               seed=args.seed, data_format=args.data_format, compile=True)
-    #     loaded_model.load_weights(os.path.join(args.outdir, args.model_name+'.weights.h5'))
-    #     onnx_model, _ = tf2onnx.convert.from_keras(loaded_model,opset=14)
-    #     onnx.save(onnx_model, os.path.join(args.outdir, args.model_name+".onnx"))
+    #     onnx_model = utils.model_utils.convert2onxx(model)
+    #     onnx_model.save()
