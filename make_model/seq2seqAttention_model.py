@@ -8,7 +8,7 @@ class Encoder(nn.Module):
         super().__init__()
 
         self.embd_layer = nn.Embedding(vocab_size, dim_embed)
-        self.dropout = nn.Dropout()
+        self.dropout = nn.Dropout(dropout_probability)
         self.rnn = nn.GRU(dim_embed, dim_hidden, num_layers, batch_first=True, dropout=dropout_probability, bidirectional=True)
 
         self.hidden_map = nn.Sequential(nn.Linear(dim_hidden*2, dim_feedforward),
