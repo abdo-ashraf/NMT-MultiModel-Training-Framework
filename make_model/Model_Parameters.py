@@ -2,13 +2,24 @@ import os
 
 
 class ModelParams():
-    def __init__(self, model_type:str, dim_embed:int,
+    def __init__(self, model_type:str, model_name:str, out_dir:str, dim_embed:int,
                   dim_model:int, dim_feedforward:int, num_layers:int, dropout:float,
-                    learning_rate:float, weight_decay:float, out_dir:str):
+                    learning_rate:float, weight_decay:float):
 
         assert model_type.lower() in ['s2s', 's2sattention', 'transformer'], "supported model_type ['s2s', 's2sAttention', 'transformer']."
         self.model_type = model_type.lower()
 
+        assert isinstance(model_name, str), f"model_name must be String"
+        self.model_name = model_name
+        
+        assert isinstance(out_dir, str), f"out_dir must be String"
+        self.out_dir = os.path.join(out_dir, 'models')
+        if not os.path.exists(self.out_dir):
+            print(f"{self.out_dir} does not exists")
+            print(f'Making dirs tree @{self.out_dir}...')
+            os.makedirs(self.out_dir, exist_ok=True)
+            print('Done.')
+            
         assert isinstance(dim_embed, int), f"dim_embed must be Integer"
         self.dim_embed = dim_embed
 
@@ -29,11 +40,3 @@ class ModelParams():
 
         assert isinstance(weight_decay, float), f"weight_decay must be Float"
         self.weight_decay = weight_decay
-
-        assert isinstance(out_dir, str), f"out_dir must be String"
-        self.out_dir = os.path.join(out_dir, 'models')
-        if not os.path.exists(self.out_dir):
-            print(f"{self.out_dir} does not exists")
-            print(f'Making dirs tree @{self.out_dir}...')
-            os.makedirs(self.out_dir, exist_ok=True)
-            print('Done.')

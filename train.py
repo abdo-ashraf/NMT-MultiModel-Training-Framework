@@ -47,6 +47,6 @@ def train_model(data_params:DataParams, model_params:ModelParams, src_tokenizer_
                                                   valid_loader=valid_loader, epochs=data_params.epochs, device=data_params.device)
   print("Model Training Done.")
 
-  plot_loss(train_class_losses, val_class_losses, data_params.plots_dir, model_params.model_type)
+  plot_loss(train_class_losses, val_class_losses, data_params.plots_dir, model_params.model_name)
 
   return model

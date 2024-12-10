@@ -20,8 +20,9 @@ def parse_arguments():
     parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for validation')
     parser.add_argument('--src_tokenizer_path', type=str, required=True, help='Path of source tokenizer model')
     parser.add_argument('--trg_tokenizer_path', type=str, required=True, help='Path of target tokenizer model')
-    parser.add_argument('--out_dir', required=True, help='Working dir')
+    parser.add_argument('--out_dir', type=str, required=True, help='Working dir')
     parser.add_argument('--model_type', choices=['s2s', 's2sAttention', 'transformer'], required=True, help='needed model architecture')
+    parser.add_argument('--model_name', type=str, required=True, help='Model prefix name')
 
     parser.add_argument('--batch_size', type=int, default=DEFAULT_BATCH_SIZE, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=DEFAULT_NUM_WORKERS, help='number of workers for dataloader')
@@ -67,18 +68,21 @@ if __name__ == '__main__':
                     maxlen=args.maxlen)
     
     mp = ModelParams(model_type=args.model_type,
+                     model_name=args.model_name,
+                     out_dir=args.out_dir,
                      dim_embed=args.dim_embed,
                      dim_model=args.dim_model,
                      dim_feedforward=args.dim_feedforward,
                      num_layers=args.num_layers,
                      dropout=args.dropout,
                      learning_rate=args.learning_rate,
-                     weight_decay=args.weight_decay,
-                     out_dir=args.out_dir)
+                     weight_decay=args.weight_decay)
     
     model = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    
     ## Save Entire Model
-    torch.save(model, f"{mp.out_dir}_{mp.model_type}.bin")
+    model_path = os.path.join(mp.out_dir, mp.model_name)
+    torch.save(model, f"{model_path}.bin")
     
     # if True == args.convert_onnx:
     #     print("Converting To ONNX framework...")
