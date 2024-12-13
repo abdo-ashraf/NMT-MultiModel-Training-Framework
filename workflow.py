@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument('--learning_rate', type=float, default=DEFAULT_LEARNING_RATE, help='learning rate')
     parser.add_argument('--weight_decay', type=float, default=DEFAULT_WEIGHT_DECAY, help='weight decay')
     parser.add_argument('--device', choices=['cpu', 'cuda'], default=DEFAULT_DEVICE, help='needed model architecture')
-    parser.add_argument('--in_onnx', type=bool, default=DEFAULT_IN_ONNX, help='Save the model in onnx (.onnx) or in pytorch (.bin) format')
+    parser.add_argument('--in_onnx', type=bool, default=DEFAULT_IN_ONNX, help='Save the model in onnx (.onnx) or in pytorch (.pth) format')
 
     return parser
  
@@ -79,7 +79,7 @@ if __name__ == '__main__':
                      learning_rate=args.learning_rate,
                      weight_decay=args.weight_decay)
     
-    model = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    model, optim = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
     
     ## Save Entire Model
     model_path = os.path.join(mp.out_dir, mp.model_name)
@@ -88,4 +88,7 @@ if __name__ == '__main__':
         ## onnx
     else:
         ## pytorch
-        torch.save(model, f"{model_path}.bin")
+        torch.save({'epoch': args.epochs,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optim.state_dict()}, f"{model_path}.pth")
+        

@@ -51,4 +51,4 @@ def train_model(data_params:DataParams, model_params:ModelParams, src_tokenizer_
 
   plot_loss(train_class_losses, val_class_losses, data_params.plots_dir, model_params.model_name)
 
-  return model
+  return model, optim

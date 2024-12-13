@@ -1,4 +1,4 @@
-python ./make_data/data_workflow.py --out_dir './out/' --data 'both' --maxlen 30 --seed 123 --valid_test_split 0.3
+python ./make_data/data_workflow.py --out_dir './out/' --data 'both' --maxlen 25 --seed 123 --valid_test_split 0.3
 
 python ./make_tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/df_train.csv --src_vocab_size 7000 --trg_vocab_size 12000 --out_dir './out/' --lang1_model_prefix 'eng_tokenizer' --lang2_model_prefix 'ara_tokenizer' --lang1_character_coverage 0.995 --lang2_character_coverage 0.999
 
