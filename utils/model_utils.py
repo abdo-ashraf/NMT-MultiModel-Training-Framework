@@ -86,7 +86,7 @@ def training(model, criterion, optimizer, train_loader, valid_loader, epochs, de
             # Backward
             optimizer.zero_grad()
             loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
             # Update progress bar
             tqdm_loop.set_description(f"Epoch [{epoch+1}/{epochs}]")

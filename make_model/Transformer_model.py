@@ -49,7 +49,46 @@ class NMT_Transformer(nn.Module):
         out = self.classifier(tf_out)
 
         return out
+    
+    @torch.no_grad
+    def translate(self, source: torch.Tensor, sos_tokenId: int, max_tries: int=100):
+        """
+        Translates a source sequence into a target sequence using greedy decoding.
+        """
+        B, Ts = source.shape
+        device = source.device
 
-    def translate(self, source:torch.Tensor, sos_tokenId, max_tries=50):
-        pass
+        # Prepare the source embeddings and mask
+        src_poses = self.src_pos(torch.arange(0, Ts).to(device).unsqueeze(0).repeat(B, 1))
+        src_embedings = self.dropout(self.src_embed(source) + src_poses)
+        src_mask = self.make_src_mask(source).to(device)
 
+        # Start decoding
+        trg_tokens = torch.full((B, 1), sos_tokenId, dtype=torch.long, device=device)  # Initial target with <SOS>
+        for _ in range(max_tries):
+            Tt = trg_tokens.size(1)
+            trg_poses = self.trg_pos(torch.arange(0, Tt).to(device).unsqueeze(0).repeat(B, 1))
+            trg_embedings = self.dropout(self.trg_embed(trg_tokens) + trg_poses)
+
+            # Generate masks
+            trg_mask = self.tranformer.generate_square_subsequent_mask(Tt).to(device)
+
+            # Perform forward pass through the transformer
+            tf_out = self.tranformer(
+                src_embedings,
+                trg_embedings,
+                src_key_padding_mask=src_mask,
+                tgt_mask=trg_mask
+            )
+
+            # Get logits and predict the next token
+            logits = self.classifier(tf_out[:, -1, :])  # Only consider the last token's output
+            next_token = logits.argmax(dim=-1, keepdim=True)  # Greedy decoding
+
+            # Append predicted token
+            trg_tokens = torch.cat([trg_tokens, next_token], dim=1)
+
+            # Stop if all batches predict <EOS> (commonly token ID 3)
+            if torch.all(next_token == 3):
+                break
+        return trg_tokens.squeeze(0).tolist()
