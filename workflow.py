@@ -38,6 +38,7 @@ def parse_arguments():
     parser.add_argument('--learning_rate', type=float, default=DEFAULT_LEARNING_RATE, help='learning rate')
     parser.add_argument('--weight_decay', type=float, default=DEFAULT_WEIGHT_DECAY, help='weight decay')
     parser.add_argument('--device', choices=['cpu', 'cuda'], default=DEFAULT_DEVICE, help='needed model architecture')
+    parser.add_argument('--in_onnx', type=bool, default=DEFAULT_IN_ONNX, help='Save the model in onnx (.onnx) or in pytorch (.bin) format')
 
     return parser
  
@@ -82,9 +83,9 @@ if __name__ == '__main__':
     
     ## Save Entire Model
     model_path = os.path.join(mp.out_dir, mp.model_name)
-    torch.save(model, f"{model_path}.bin")
-    
-    # if True == args.convert_onnx:
-    #     print("Converting To ONNX framework...")
-    #     onnx_model = utils.model_utils.convert2onxx(model)
-    #     onnx_model.save()
+    if args.in_onnx:
+        print("Converting To ONNX framework...")
+        ## onnx
+    else:
+        ## pytorch
+        torch.save(model, f"{model_path}.bin")

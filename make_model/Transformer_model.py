@@ -26,8 +26,11 @@ class NMT_Transformer(nn.Module):
                                          norm_first=False)
         
         self.classifier = nn.Linear(dim_model, decoder_vocab_size)
-        self.make_src_mask = lambda src: src==src_pad_tokenId
-
+        self.src_pad_tokenId = src_pad_tokenId
+        # self.make_src_mask = lambda src: src==src_pad_tokenId
+    def make_src_mask(self, src):
+        return src==self.src_pad_tokenId
+    
     def forward(self, source, target):
         B, Ts = source.shape
         B, Tt = target.shape

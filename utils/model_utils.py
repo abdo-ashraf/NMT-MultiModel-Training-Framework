@@ -41,10 +41,19 @@ def loss_acc_loader(model, data_loader, criterion, device):
 
 
 def get_parameters_info(model):
-    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad==True)
-    nontrainable = sum(p.numel() for p in model.parameters() if p.requires_grad==False)
+    names = []
+    trainable = []
+    nontrainable = []
 
-    return trainable, nontrainable
+    for name, module, in model.named_children():
+        names.append(name)
+        trainable.append(sum(p.numel() for p in module.parameters() if p.requires_grad==True))
+        nontrainable.append(sum(p.numel() for p in module.parameters() if p.requires_grad==False))
+
+    names.append("TotalParams")
+    trainable.append(sum(trainable))
+    nontrainable.append(sum(nontrainable))
+    return names, trainable, nontrainable
 
 
 def training(model, criterion, optimizer, train_loader, valid_loader, epochs, device):

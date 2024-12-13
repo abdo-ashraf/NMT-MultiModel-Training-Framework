@@ -37,8 +37,10 @@ def train_model(data_params:DataParams, model_params:ModelParams, src_tokenizer_
                                             maxlen=data_params.maxlen)
   print("Model Loading Done.")
 
-  tr, nontr = get_parameters_info(model=model)
-  print(f"Total trainable parameters = {tr:,}\nTotal non-trainable parameters = {nontr:,}")
+  names, tr, nontr = get_parameters_info(model=model)
+  print(f"{'Module':<15}{'Trainable':>15}{'Non-Trainable':>15}")
+  for n, ttp, ntp in zip(names, tr, nontr):
+    print(f"{n:<15}{ttp:>15,}{ntp:>15,}")
   model = model.to(data_params.device)
 
   print("Starting Model Training...")
