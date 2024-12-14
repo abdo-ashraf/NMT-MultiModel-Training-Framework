@@ -44,11 +44,11 @@ def train_model(data_params:DataParams, model_params:ModelParams, src_tokenizer_
   model = model.to(data_params.device)
 
   print("Starting Model Training...")
-  train_class_losses, val_class_losses = training(model=model, criterion=class_criterion,
+  train_class_losses, val_class_losses, model, optim, epochs = training(model=model, criterion=class_criterion,
                                                   optimizer=optim, train_loader=train_loader,
                                                   valid_loader=valid_loader, epochs=data_params.epochs, device=data_params.device)
   print("Model Training Done.")
 
   plot_loss(train_class_losses, val_class_losses, data_params.plots_dir, model_params.model_name)
 
-  return model, optim
+  return train_class_losses, val_class_losses, model, optim, epochs

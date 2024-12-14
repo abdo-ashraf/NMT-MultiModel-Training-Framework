@@ -76,8 +76,8 @@ def training(model, criterion, optimizer, train_loader, valid_loader, epochs, de
             # Forward
             class_logits = model(data, labels)
 
-            class_logits_flat = class_logits[:, 1:, :].reshape(-1, class_logits.size(-1))
-            labels_flat = labels[:, 1:].reshape(-1)
+            class_logits_flat = class_logits.reshape(-1, class_logits.size(-1))
+            labels_flat = labels.reshape(-1)
             loss = criterion(class_logits_flat, labels_flat)
 
             epoch_losses.append(loss.item())
@@ -109,7 +109,7 @@ def training(model, criterion, optimizer, train_loader, valid_loader, epochs, de
         if new_lr < current_lr:
             print(f"Epoch {epoch + 1}: Reducing learning rate from {current_lr:.6f} to {new_lr:.6f}")
 
-    return train_class_losses, val_class_losses
+    return train_class_losses, val_class_losses, model, optimizer, epochs
 
 
 def plot_loss(train_class_losses, val_class_losses, plots_dir, model_name):

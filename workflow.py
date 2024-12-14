@@ -79,7 +79,7 @@ if __name__ == '__main__':
                      learning_rate=args.learning_rate,
                      weight_decay=args.weight_decay)
     
-    model, optim = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    train_class_losses, val_class_losses, model, optim, epochs = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
     
     ## Save Entire Model
     model_path = os.path.join(mp.out_dir, mp.model_name)
@@ -90,5 +90,7 @@ if __name__ == '__main__':
         ## pytorch
         torch.save({'epoch': args.epochs,
                     'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optim.state_dict()}, f"{model_path}.pth")
+                    'optimizer_state_dict': optim.state_dict(),
+                    "Training losses": train_class_losses,
+                    "Validation losses": val_class_losses}, f"{model_path}.pth")
         
