@@ -38,7 +38,11 @@ class Trainer():
 
         print("Starting Model Training...")
         class_criterion = torch.nn.CrossEntropyLoss(ignore_index=self.collator.pad_value)  # Classification loss
-        optimizer = torch.optim.adamw(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
+        if hasattr(self.model, 'maxlen'):
+            optimizer = torch.optim.adamw(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
+        else:
+            optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+            
         train_class_losses, val_class_losses= training_loop(model=self.model,
                                                             criterion=class_criterion,
                                                             optimizer=optimizer,
