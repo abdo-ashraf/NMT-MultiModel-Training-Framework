@@ -1,11 +1,17 @@
-from utils.Data_Parameters import DataParams
-from make_model.Model_Parameters import ModelParams
+import pandas as pd
+from Models.AutoModel import get_model
+from Models.Trainer import Trainer
+from Models.TrainingArguments import TrainingArguments
+from Tokenizers.Tokenizers import Callable_tokenizer
+from Models.ModelArgs import ModelArgs
 from train import train_model
 import os
 import argparse
 import sys
 from config import *
 import torch
+
+from utils.data_utils import MT_Dataset, MYCollate
 # import onnx
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
@@ -57,40 +63,44 @@ if __name__ == '__main__':
     assert os.path.exists(args.trg_tokenizer_path), f"{args.trg_tokenizer_path} : Tokenizer.model not found."
     if not os.path.exists(args.out_dir): os.makedirs(args.out_dir, exist_ok=True)
     
-    # Call the function with the parsed arguments
-    dp = DataParams(train_csv_path=args.train_csv_path,
-                    valid_csv_path=args.valid_csv_path,
-                    epochs=args.epochs,
-                    batch_size=args.batch_size,
-                    num_workers=args.num_workers,
-                    seed=args.seed,
-                    device=args.device,
-                    out_dir=args.out_dir,
-                    maxlen=args.maxlen)
+
+
+    print("Starting Tokenizers Loading...")
+    src_tokenizer = Callable_tokenizer(args.src_tokenizer_path)
+    trg_tokenizer = Callable_tokenizer(args.trg_tokenizer_path)
+    src_vocab_size = len(src_tokenizer)
+    trg_vocab_size = len(trg_tokenizer)
+    print("Tokenizers Loading Done.")
+
+    train_df = pd.read_csv(args.train_csv_path)
+    valid_df = pd.read_csv(args.valid_csv_path)
+
+    train_ds = MT_Dataset(src_sentences_list=train_df[0], trg_sentences_list=train_df[1],
+                          src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
+    valid_ds = MT_Dataset(src_sentences_list=valid_df[0], trg_sentences_list=valid_df[1],
+                          src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     
-    mp = ModelParams(model_type=args.model_type,
-                     model_name=args.model_name,
-                     out_dir=args.out_dir,
-                     dim_embed=args.dim_embed,
-                     dim_model=args.dim_model,
-                     dim_feedforward=args.dim_feedforward,
-                     num_layers=args.num_layers,
-                     dropout=args.dropout,
-                     learning_rate=args.learning_rate,
-                     weight_decay=args.weight_decay)
+    mycollate = MYCollate(batch_first=True, pad_value=-100)
     
-    train_class_losses, val_class_losses, model, optim, epochs = train_model(dp, mp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    model_args = ModelArgs(model_type=args.model_type,
+                           model_name=args.model_name,
+                           dim_embed=args.dim_embed,
+                           dim_model=args.dim_model,
+                           dim_feedforward=args.dim_feedforward,
+                           num_layers=args.num_layers,
+                           dropout=args.dropout)
+    model = get_model(model_args, src_vocab_size, trg_vocab_size, -100, args.maxlen)
+
+    training_args = TrainingArguments()
+    trainer = Trainer(args=training_args, model=model,
+                      train_ds=train_df, valid_ds=valid_df,
+                      collator=MYCollate(), compute_metrics_func=None)
     
-    ## Save Entire Model
-    model_path = os.path.join(mp.out_dir, mp.model_name)
-    if args.in_onnx:
-        print("Converting To ONNX framework...")
-        ## onnx
-    else:
-        ## pytorch
-        torch.save({'epoch': args.epochs,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optim.state_dict(),
-                    "Training losses": train_class_losses,
-                    "Validation losses": val_class_losses}, f"{model_path}.pth")
+    train_losses, valid_losses = trainer.train()
+
+
+
+    # train_class_losses, val_class_losses, model, optim, epochs = train_model(dp, args.src_tokenizer_path, args.trg_tokenizer_path)
+    
+    
         
