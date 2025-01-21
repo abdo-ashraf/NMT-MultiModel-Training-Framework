@@ -73,9 +73,9 @@ class Seq2seq_no_attention(nn.Module):
         return total_outputs
     
     @torch.no_grad
-    def translate(self, source:torch.Tensor, sos_tokenId, max_tries=50):
+    def translate(self, source:torch.Tensor, trg_sos_tokenId: int, trg_eos_tokenId:int, max_tries=100):
 
-        targets_hat = [sos_tokenId]
+        targets_hat = [trg_sos_tokenId]
         context = self.encoder(source.unsqueeze(0))
         context = context.unsqueeze(0).repeat(self.num_layers,1,1)
         for step in range(1, max_tries):
@@ -84,7 +84,7 @@ class Seq2seq_no_attention(nn.Module):
             logits = self.classifier(out)
             top1 = logits.argmax(-1)
             targets_hat.append(top1.item())
-            if top1 == 3:
+            if top1 == trg_eos_tokenId:
                 return targets_hat
 
         return targets_hat
