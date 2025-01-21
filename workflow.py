@@ -28,7 +28,6 @@ def parse_arguments():
     parser.add_argument('--model_config_path', type=str, required=True, help='A path for model configuration file')
     parser.add_argument('--training_config_path', type=str, required=True, help='A path for training configuration file')
     
-
     return parser
  
 
@@ -64,7 +63,7 @@ if __name__ == '__main__':
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     valid_ds = MT_Dataset(src_sentences_list=valid_df[valid_df.columns[0]], trg_sentences_list=valid_df[valid_df.columns[1]],
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
-    mycollate = MYCollate(batch_first=True, pad_value=-100)
+    mycollate = MYCollate(batch_first=True, pad_value=trg_tokenizer.get_tokenId('<pad>'))
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
     print(train_df.head(3))
     print("Data Loading Done.")
