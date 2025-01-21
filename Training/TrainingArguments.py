@@ -75,9 +75,28 @@ class TrainingArguments:
 
 
     def __repr__(self):
-        return (f"TrainingArguments(output_dir='{self.output_dir}', learning_rate={self.learning_rate}, "
-                f"num_train_epochs={self.num_train_epochs}, seed={self.seed}, precision='{self.precision}', "
-                f"device='{self.device}', batch_size={self.batch_size}, cpu_num_workers={self.cpu_num_workers}, "
-                f"weight_decay={self.weight_decay}, maxlen={self.maxlen}, onnx={self.onnx}, run_name='{self.run_name}', "
-                f"pin_memory={self.pin_memory}, warmup_epochs={self.warmup_epochs}, save_epochs={self.save_epochs}, "
-                f"torch_compile={self.torch_compile})")
+        """
+        String representation of the TrainingArguments object.
+
+        Returns:
+            str: A string showing all attributes and their values.
+        """
+        return ("TrainingArguments(\n" +
+                f"  save_models_dir='{self.save_models_dir}',\n" +
+                f"  save_plots_dir='{self.save_plots_dir}',\n" +
+                f"  learning_rate={self.learning_rate},\n" +
+                f"  num_train_epochs={self.num_train_epochs},\n" +
+                f"  seed={self.seed},\n" +
+                f"  precision='{self.precision}',\n" +
+                f"  device='{self.device}',\n" +
+                f"  batch_size={self.batch_size},\n" +
+                f"  cpu_num_workers={self.cpu_num_workers},\n" +
+                f"  weight_decay={self.weight_decay},\n" +
+                f"  maxlen={self.maxlen},\n" +
+                f"  onnx={self.onnx},\n" +
+                f"  run_name='{self.run_name}',\n" +
+                f"  pin_memory={self.pin_memory},\n" +
+                f"  warmup_epochs={self.warmup_epochs},\n" +
+                f"  save_epochs={self.save_epochs},\n" +
+                f"  torch_compile={self.torch_compile}\n" +
+                ")")

@@ -45,7 +45,13 @@ class ModelArgs:
         assert isinstance(self.flash_attention, bool), "flash_attention must be a boolean."
 
     def __repr__(self):
-        return (f"ModelArgs(model_type={self.model_type}, dim_embed={self.dim_embed}, "
-                f"dim_model={self.dim_model}, dim_feedforward={self.dim_feedforward}, "
-                f"num_layers={self.num_layers}, dropout={self.dropout}, maxlen={self.maxlen}, "
-                f"flash_attention={self.flash_attention})")
+        return (f"ModelArgs(\n" +
+                f"model_type={self.model_type},\n" +
+                f"dim_embed={self.dim_embed},\n" +
+                f"dim_model={self.dim_model},\n" +
+                f"dim_feedforward={self.dim_feedforward},\n" +
+                f"num_layers={self.num_layers},\n" +
+                f"dropout={self.dropout},\n" +
+                f"maxlen={self.maxlen},\n" +
+                f"flash_attention={self.flash_attention}\n" +
+                ")")
