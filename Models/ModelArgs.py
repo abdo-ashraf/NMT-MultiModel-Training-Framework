@@ -47,4 +47,5 @@ class ModelArgs:
     def __repr__(self):
         return (f"ModelArgs(model_type={self.model_type}, dim_embed={self.dim_embed}, "
                 f"dim_model={self.dim_model}, dim_feedforward={self.dim_feedforward}, "
-                f"num_layers={self.num_layers}, dropout={self.dropout}, maxlen={self.maxlen})")
+                f"num_layers={self.num_layers}, dropout={self.dropout}, maxlen={self.maxlen}, "
+                f"flash_attention={self.flash_attention})")
