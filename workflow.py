@@ -65,7 +65,7 @@ if __name__ == '__main__':
     mycollate = MYCollate(batch_first=True, pad_value=-100)
     
     model_args = ModelArgs(config_path=args.model_config_path)
-    model = get_model(model_args, src_vocab_size, trg_vocab_size, mycollate.pad_value)
+    model = get_model(model_args, src_vocab_size, trg_vocab_size)
 
     names, tr, nontr = get_parameters_info(model=model)
     print(f"{'Module':<15}{'Trainable':>15}{'Non-Trainable':>15}")

@@ -5,8 +5,7 @@ from torch import nn
 class NMT_Transformer(nn.Module):
     def __init__(self, encoder_vocab_size:int, decoder_vocab_size:int,
                  dim_embed:int, dim_model:int, dim_feedforward:int,
-                 num_layers:int, dropout_probability:float,
-                 src_pad_tokenId:int, trg_pad_tokenId:int, maxlen:int):
+                 num_layers:int, dropout_probability:float, maxlen:int):
         super().__init__()
 
         self.src_embed = nn.Embedding(num_embeddings=encoder_vocab_size, embedding_dim=dim_embed)
@@ -30,8 +29,6 @@ class NMT_Transformer(nn.Module):
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
         
         self.classifier = nn.Linear(dim_model, decoder_vocab_size)
-        self.src_pad_tokenId = src_pad_tokenId
-        self.trg_pad_tokenId = trg_pad_tokenId
         self.maxlen = maxlen
         self.apply(self._init_weights)
 
@@ -46,7 +43,7 @@ class NMT_Transformer(nn.Module):
             torch.nn.init.ones_(module.weight)
             torch.nn.init.zeros_(module.bias)
     
-    def forward(self, source, target):
+    def forward(self, source, target, src_pad_tokenId, trg_pad_tokenId):
         B, Ts = source.shape
         B, Tt = target.shape
         device = source.device
@@ -54,13 +51,13 @@ class NMT_Transformer(nn.Module):
         src_poses = self.src_pos(torch.arange(0, Ts).to(device).unsqueeze(0).repeat(B, 1))
         src_embedings = self.dropout(self.src_embed(source) + src_poses)
 
-        src_pad_mask = source == self.src_pad_tokenId
+        src_pad_mask = source == src_pad_tokenId
         memory = self.transformer_encoder(src=src_embedings, mask=None, src_key_padding_mask=src_pad_mask, is_causal=False)
         ## Decoder Path
         trg_poses = self.trg_pos(torch.arange(0, Tt).to(device).unsqueeze(0).repeat(B, 1))
         trg_embedings = self.dropout(self.trg_embed(target) + trg_poses)
         
-        trg_pad_mask = target == self.trg_pad_tokenId
+        trg_pad_mask = target == trg_pad_tokenId
         tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(Tt, dtype=bool).to(device)
         decoder_out = self.transformer_decoder.forward(tgt=trg_embedings,
                                                 memory=memory,
