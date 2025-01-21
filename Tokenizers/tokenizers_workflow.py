@@ -1,5 +1,5 @@
 import argparse
-from Tokenizers import Tokenizers
+import Tokenizers
 import os
 import json
 
