@@ -43,7 +43,7 @@ class NMT_Transformer(nn.Module):
             torch.nn.init.ones_(module.weight)
             torch.nn.init.zeros_(module.bias)
     
-    def forward(self, source, target, src_pad_tokenId, trg_pad_tokenId):
+    def forward(self, source, target, src_pad_tokenId=None, trg_pad_tokenId=None):
         B, Ts = source.shape
         B, Tt = target.shape
         device = source.device
@@ -51,13 +51,13 @@ class NMT_Transformer(nn.Module):
         src_poses = self.src_pos(torch.arange(0, Ts).to(device).unsqueeze(0).repeat(B, 1))
         src_embedings = self.dropout(self.src_embed(source) + src_poses)
 
-        src_pad_mask = source == src_pad_tokenId
+        src_pad_mask = source == src_pad_tokenId if src_pad_tokenId is not None else None
         memory = self.transformer_encoder(src=src_embedings, mask=None, src_key_padding_mask=src_pad_mask, is_causal=False)
         ## Decoder Path
         trg_poses = self.trg_pos(torch.arange(0, Tt).to(device).unsqueeze(0).repeat(B, 1))
         trg_embedings = self.dropout(self.trg_embed(target) + trg_poses)
         
-        trg_pad_mask = target == trg_pad_tokenId
+        trg_pad_mask = target == trg_pad_tokenId if trg_pad_tokenId is not None else None
         tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(Tt, dtype=bool).to(device)
         decoder_out = self.transformer_decoder.forward(tgt=trg_embedings,
                                                 memory=memory,
