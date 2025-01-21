@@ -66,6 +66,7 @@ if __name__ == '__main__':
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     mycollate = MYCollate(batch_first=True, pad_value=-100)
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
+    print(train_df.head(3))
     print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")
@@ -91,7 +92,7 @@ if __name__ == '__main__':
                       train_ds=train_df, valid_ds=valid_df,
                       collator=mycollate,
                       compute_metrics_func=None)
-    import sys; sys.exit()
+
     train_losses, valid_losses = trainer.train()
     print("Training Done.")
   
