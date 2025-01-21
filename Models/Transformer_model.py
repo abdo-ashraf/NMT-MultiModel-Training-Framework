@@ -6,7 +6,7 @@ class NMT_Transformer(nn.Module):
     def __init__(self, encoder_vocab_size:int, decoder_vocab_size:int,
                  dim_embed:int, dim_model:int, dim_feedforward:int,
                  num_layers:int, dropout_probability:float,
-                 src_pad_tokenId:int, maxlen:int):
+                 pad_tokenId:int, maxlen:int):
         super().__init__()
 
         self.src_embed = nn.Embedding(num_embeddings=encoder_vocab_size, embedding_dim=dim_embed)
@@ -26,7 +26,7 @@ class NMT_Transformer(nn.Module):
                                          norm_first=True)
         
         self.classifier = nn.Linear(dim_model, decoder_vocab_size)
-        self.src_pad_tokenId = src_pad_tokenId
+        self.pad_tokenId = pad_tokenId
         self.apply(self._init_weights)
 
     def _init_weights(self, module):
@@ -39,7 +39,7 @@ class NMT_Transformer(nn.Module):
     
         # self.make_src_mask = lambda src: src==src_pad_tokenId
     def make_src_mask(self, src):
-        return src==self.src_pad_tokenId
+        return src==self.pad_tokenId
     
     def forward(self, source, target):
         B, Ts = source.shape
