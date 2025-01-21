@@ -45,6 +45,9 @@ class Trainer():
             print('Adam will be used for non-Transformer models')
             optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
 
+        if self.args.torch_compile:
+            self.model = torch.compile(self.model)
+            
         train_class_losses, val_class_losses = training_loop(model=self.model,
                                                             criterion=class_criterion,
                                                             optimizer=optimizer,
