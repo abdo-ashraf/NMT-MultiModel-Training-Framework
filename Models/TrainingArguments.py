@@ -2,7 +2,7 @@ class TrainingArguments():
     def __init__(self, output_dir, learning_rate, num_train_epochs,
                  seed, precision, device, plots_dir, optimizer,
                  batch_size, cpu_num_workers, weight_decay, maxlen,
-                 onnx, run_name):
+                 onnx, run_name, pin_memory):
         self.output_dir = output_dir
         self.learning_rate = learning_rate
         self.num_train_epochs = num_train_epochs
@@ -18,3 +18,4 @@ class TrainingArguments():
         self.maxlen = maxlen
         self.onnx = onnx
         self.run_name = run_name
+        self.pin_memory = pin_memory
