@@ -48,13 +48,15 @@ if __name__ == '__main__':
     assert os.path.exists(args.training_config_path), f"{args.training_config_path} : Training configuration file not found."
     
 
-    print("Starting Tokenizers Loading...")
+    print("---------------------Starting Tokenizers Loading...---------------------")
     src_tokenizer = Callable_tokenizer(args.src_tokenizer_path)
     trg_tokenizer = Callable_tokenizer(args.trg_tokenizer_path)
     src_vocab_size = len(src_tokenizer)
     trg_vocab_size = len(trg_tokenizer)
+    print(f"Source tokenizer length {src_vocab_size}, Target tokenizer length {trg_vocab_size}")
     print("Tokenizers Loading Done.")
 
+    print("---------------------Starting Data Loading...---------------------")
     train_df = pd.read_csv(args.train_csv_path)
     valid_df = pd.read_csv(args.valid_csv_path)
 
@@ -63,21 +65,33 @@ if __name__ == '__main__':
     valid_ds = MT_Dataset(src_sentences_list=valid_df[valid_df.columns[0]], trg_sentences_list=valid_df[valid_df.columns[1]],
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     mycollate = MYCollate(batch_first=True, pad_value=-100)
-    
-    model_args = ModelArgs(config_path=args.model_config_path)
-    model = get_model(model_args, src_vocab_size, trg_vocab_size)
+    print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
+    print("Data Loading Done.")
 
+    print("---------------------Parsing Model arguments...---------------------")
+    model_args = ModelArgs(config_path=args.model_config_path)
+    print(model_args)
+    print("Parsing Done.")
+
+    print("---------------------Loading the model...---------------------")
+    model = get_model(model_args, src_vocab_size, trg_vocab_size)
     names, tr, nontr = get_parameters_info(model=model)
     print(f"{'Module':<15}{'Trainable':>15}{'Non-Trainable':>15}")
     for n, ttp, ntp in zip(names, tr, nontr):
         print(f"{n:<15}{ttp:>15,}{ntp:>15,}")
+    print("Model Loading Done.")
     
+    print("---------------------Parsing Training arguments...---------------------")
     training_args = TrainingArguments(args.training_config_path)
+    print(training_args)
+    print("Parsing Done.")
 
+    print("---------------------Start training...---------------------")
     trainer = Trainer(args=training_args, model=model,
                       train_ds=train_df, valid_ds=valid_df,
                       collator=mycollate,
                       compute_metrics_func=None)
-    
+    import sys; sys.exit()
     train_losses, valid_losses = trainer.train()
+    print("Training Done.")
   
