@@ -1,0 +1,19 @@
+{
+    "save_models_dir": "./out/models",
+    "save_plots_dir": "./out/plots",
+    "learning_rate": 1e-4,
+    "num_train_epochs": 20,
+    "seed": 123,
+    "precision": "highest",
+    "device": "cuda",
+    "batch_size": 64,
+    "cpu_num_workers": 4,
+    "weight_decay": 0.01,
+    "maxlen": 100,
+    "onnx": false,
+    "run_name": "experiment_01",
+    "pin_memory": true,
+    "warmup_epochs": 2,
+    "save_epochs": 5,
+    "torch_compile": false
+}

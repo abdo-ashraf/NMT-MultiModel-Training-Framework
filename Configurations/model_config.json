@@ -1,0 +1,10 @@
+{
+    "model_type": "transformer",
+    "dim_embed": 512,
+    "dim_model": 512,
+    "dim_feedforward": 2048,
+    "num_layers": 6,
+    "dropout": 0.3,
+    "maxlen": 100,
+    "flash_attention": false
+}

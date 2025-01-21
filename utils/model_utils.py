@@ -58,8 +58,6 @@ def get_parameters_info(model):
 
 def training_loop(model, criterion, optimizer, train_loader, valid_loader, epochs, device):
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer, mode='min', factor=0.5,
-                                                           patience=5, min_lr=1e-6, threshold=0.001)
     total_batches = len(train_loader)
     train_class_losses = []
     val_class_losses = []
@@ -98,16 +96,6 @@ def training_loop(model, criterion, optimizer, train_loader, valid_loader, epoch
         val_class_losses.append(val_class_loss)
         print(f'Validation: Class Loss {val_class_loss:.4f}, Accuracy {val_accuracy*100:.2f}%')
 
-        # Get the current learning rate from the optimizer
-        current_lr = optimizer.param_groups[0]['lr']
-        
-        # Step the scheduler with the validation loss
-        scheduler.step(val_class_loss)
-        
-        # Check if the learning rate has changed
-        new_lr = optimizer.param_groups[0]['lr']
-        if new_lr < current_lr:
-            print(f"Epoch {epoch + 1}: Reducing learning rate from {current_lr:.6f} to {new_lr:.6f}")
 
     return train_class_losses, val_class_losses
 
