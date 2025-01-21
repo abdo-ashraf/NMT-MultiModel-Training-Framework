@@ -4,7 +4,7 @@ from Models.Transformer_model import NMT_Transformer
 from Models.ModelArgs import ModelArgs
 
 
-def get_model(params:ModelArgs, src_vocab_size, trg_vocab_size, pad_tokenId, maxlen):
+def get_model(params:ModelArgs, src_vocab_size, trg_vocab_size, pad_tokenId):
 
     if params.model_type.lower() == 's2s': model = Seq2seq_no_attention(encoder_vocab_size=src_vocab_size,
                                                         decoder_vocab_size=trg_vocab_size,
@@ -30,7 +30,7 @@ def get_model(params:ModelArgs, src_vocab_size, trg_vocab_size, pad_tokenId, max
                                 num_layers=params.num_layers,
                                 dropout_probability=params.dropout,
                                 pad_tokenId=pad_tokenId,
-                                maxlen=maxlen)
+                                maxlen=params.maxlen)
     return model
 
     # optim = torch.optim.AdamW(params=model.parameters(),

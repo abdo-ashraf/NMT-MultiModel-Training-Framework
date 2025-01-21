@@ -1,25 +1,50 @@
-class ModelArgs():
-    def __init__(self, model_type:str, model_name:str, dim_embed:int,
-                 dim_model:int, dim_feedforward:int, num_layers:int,
-                 dropout:float):
+import json
 
-        assert model_type.lower() in ['s2s', 's2sattention', 'transformer'], "supported model_type ['s2s', 's2sAttention', 'transformer']."
-        self.model_type = model_type.lower()
+class ModelArgs:
+    """
+    A class to parse and store model configuration from a JSON file.
+    """
+    def __init__(self, config_path: str):
+        """
+        Initialize ModelArgs with configuration from a JSON file.
 
-        assert isinstance(model_name, str), f"model_name must be String"
-        self.model_name = model_name
-            
-        assert isinstance(dim_embed, int), f"dim_embed must be Integer"
-        self.dim_embed = dim_embed
+        Args:
+            config_path (str): Path to the JSON configuration file.
 
-        assert isinstance(dim_model, int), f"dim_model must be Integer"
-        self.dim_model = dim_model
+        Raises:
+            AssertionError: If the JSON content is invalid or has missing keys.
+        """
+        # Load JSON file
+        with open(config_path, 'r') as file:
+            config = json.load(file)
+        
+        # Validate and assign attributes
+        self.model_type = config.get("model_type", "").lower()
+        assert self.model_type in ['s2s', 's2sattention', 'transformer'], \
+            "Supported model_type values are ['s2s', 's2sAttention', 'transformer']."
+        
+        self.dim_embed = config.get("dim_embed")
+        assert isinstance(self.dim_embed, int), "dim_embed must be an integer."
+        
+        self.dim_model = config.get("dim_model")
+        assert isinstance(self.dim_model, int), "dim_model must be an integer."
+        
+        self.dim_feedforward = config.get("dim_feedforward")
+        assert isinstance(self.dim_feedforward, int), "dim_feedforward must be an integer."
+        
+        self.num_layers = config.get("num_layers")
+        assert isinstance(self.num_layers, int), "num_layers must be an integer."
+        
+        self.dropout = config.get("dropout")
+        assert isinstance(self.dropout, float), "dropout must be a float."
 
-        assert isinstance(dim_feedforward, int), f"dim_feedforward must be Integer"
-        self.dim_feedforward = dim_feedforward
+        self.maxlen = config.get("maxlen")
+        assert isinstance(self.maxlen, int), "maxlen must be an integer."
 
-        assert isinstance(num_layers, int), f"num_layers must be Integer"
-        self.num_layers = num_layers
+        self.flash_attention = config.get("flash_attention")
+        assert isinstance(self.flash_attention, bool), "flash_attention must be a boolean."
 
-        assert isinstance(dropout, float), f"dropout must be Float"
-        self.dropout = dropout
+    def __repr__(self):
+        return (f"ModelArgs(model_type={self.model_type}, dim_embed={self.dim_embed}, "
+                f"dim_model={self.dim_model}, dim_feedforward={self.dim_feedforward}, "
+                f"num_layers={self.num_layers}, dropout={self.dropout}, maxlen={self.maxlen})")
