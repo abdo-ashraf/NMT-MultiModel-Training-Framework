@@ -1,9 +1,6 @@
 python ./make_data/data_workflow.py --out_dir './out/' --data 'both' --maxlen 25 --seed 123 --valid_test_split 0.3
 
-python make_tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/df_train.csv --config_path './tokenizers_config.json'
+python ./Tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/df_train.csv --config_path ./Configurations/tokenizers_config.json
 
-python ./workflow.py --train_csv_path './out/data/df_train.csv' --valid_csv_path './out/data/df_valid.csv' --src_tokenizer_path './out/tokenizers/eng_tokenizer.model' --trg_tokenizer_path './out/tokenizers/ara_tokenizer.model' --out_dir './out/' --model_type 's2s' --model_name "model_name" --batch_size 64 --num_workers 2 --seed 123 --maxlen 100 --epochs 2 --dim_embed 64 --dim_model 64 --dim_feedforward 256 --num_layers 2 --dropout 0.3 --learning_rate 0.001 --weight_decay 0.0001 --device 'cuda'
+python ./workflow.py --train_csv_path out/data/df_train.csv --valid_csv_path out/data/df_valid.csv --src_tokenizer_path out/tokenizers/src_tokenizer.model --trg_tokenizer_path out/tokenizers/trg_tokenizer.model --model_config_path Configurations/model_config.json --training_config_path Configurations/training_config.json
 
-
-
-## python ./make_tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/df_train.csv --src_vocab_size 7000 --trg_vocab_size 12000 --out_dir './out/' --lang1_model_prefix 'eng_tokenizer' --lang2_model_prefix 'ara_tokenizer' --lang1_character_coverage 0.995 --lang2_character_coverage 0.999
