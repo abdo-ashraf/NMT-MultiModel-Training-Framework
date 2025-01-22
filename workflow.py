@@ -9,8 +9,7 @@ import argparse
 import sys
 import torch
 
-from utils.data_utils import MT_Dataset, MYCollate
-from utils.model_utils import get_parameters_info
+from utils import MT_Dataset, MYCollate, compute_bleu, get_parameters_info
 # import onnx
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
@@ -59,13 +58,18 @@ if __name__ == '__main__':
     train_df = pd.read_csv(args.train_csv_path)
     valid_df = pd.read_csv(args.valid_csv_path)
 
-    train_ds = MT_Dataset(src_sentences_list=train_df[train_df.columns[0]], trg_sentences_list=train_df[train_df.columns[1]],
+    train_ds = MT_Dataset(src_sentences_list=train_df[train_df.columns[0]].to_list(),
+                          trg_sentences_list=train_df[train_df.columns[1]].to_list(),
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
-    valid_ds = MT_Dataset(src_sentences_list=valid_df[valid_df.columns[0]], trg_sentences_list=valid_df[valid_df.columns[1]],
+    
+    valid_ds = MT_Dataset(src_sentences_list=valid_df[valid_df.columns[0]].to_list(),
+                          trg_sentences_list=valid_df[valid_df.columns[1]].to_list(),
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
+    
     mycollate = MYCollate(batch_first=True, pad_value=trg_tokenizer.get_tokenId('<pad>'))
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
-    print(train_df.head(3))
+    print(f"Source tokens shape: {train_ds[3][0].shape}, Target_forward shape {train_ds[3][1].shape}, Target_loss shape {train_ds[3][2].shape}")
+    print("Data Loading Done.")
     print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")
@@ -88,9 +92,9 @@ if __name__ == '__main__':
 
     print("---------------------Start training...---------------------")
     trainer = Trainer(args=training_args, model=model,
-                      train_ds=train_df, valid_ds=valid_df,
+                      train_ds=train_ds, valid_ds=valid_ds,
                       collator=mycollate,
-                      compute_metrics_func=None)
+                      compute_metrics_func=compute_bleu)
 
     train_losses, valid_losses = trainer.train()
     print("Training Done.")
