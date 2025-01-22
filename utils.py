@@ -2,6 +2,8 @@ import torch
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
 from Tokenizers.Tokenizers import Callable_tokenizer
+import matplotlib.pyplot as plt
+import os
 
 
 ## Dataset
@@ -34,6 +36,7 @@ class MT_Dataset(Dataset):
         if self.reversed_input: input_tensor_tokens = input_tensor_tokens.flip(0)
 
         return input_tensor_tokens, target_tensor_tokens
+ 
     
 ## Collator
 class MYCollate():
@@ -50,3 +53,45 @@ class MYCollate():
         padded_ar_stentences = pad_sequence(ar_stentences, batch_first=self.batch_first,
                                                       padding_value=self.pad_value)
         return padded_en_stentences, padded_ar_stentences
+    
+
+def get_parameters_info(model):
+    names = []
+    trainable = []
+    nontrainable = []
+
+    for name, module, in model.named_children():
+        names.append(name)
+        trainable.append(sum(p.numel() for p in module.parameters() if p.requires_grad==True))
+        nontrainable.append(sum(p.numel() for p in module.parameters() if p.requires_grad==False))
+
+    names.append("TotalParams")
+    trainable.append(sum(trainable))
+    nontrainable.append(sum(nontrainable))
+    return names, trainable, nontrainable
+
+
+def plot_loss(train_class_losses, val_class_losses, plots_dir, model_name):
+
+    fig = plt.figure(figsize=(8, 3))
+    epochs = [ep + 1 for ep in range(len(train_class_losses))]
+    plt.plot(epochs, train_class_losses, label="Training Classification Loss")
+    plt.plot(epochs, val_class_losses, label="Validation Classification Loss")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.legend()  # Add a legend to differentiate the lines
+    plot_path = os.path.join(plots_dir, f'{model_name}_losses.png')
+    plt.savefig(plot_path, dpi=300)
+    # Close the plot to prevent it from displaying
+    plt.close(fig)
+
+def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str, step:int, in_onnx=False):
+    model_path = os.path.join(save_dir, f"{run_name}_step_{step}.pth")
+    if in_onnx:
+        ## onnx
+        print("Converting To ONNX framework...")
+    else:
+        ## pytorch
+        torch.save({'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict()}, model_path)
+    print(f"Checkpoint saved at: {model_path}")
