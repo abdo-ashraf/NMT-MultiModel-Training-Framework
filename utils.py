@@ -43,8 +43,9 @@ class MT_Dataset(Dataset):
     
 ## Collator
 class MYCollate():
-    def __init__(self, batch_first=True, pad_value=-100):
-        self.pad_value = pad_value
+    def __init__(self, batch_first=True, src_pad_value=0, trg_pad_value=0):
+        self.src_pad_value = src_pad_value
+        self.trg_pad_value = trg_pad_value
         self.batch_first = batch_first
 
     def __call__(self, data):
@@ -53,11 +54,11 @@ class MYCollate():
         trg_stentences_loss = [ex[2] for ex in data]
 
         padded_src_stentences = pad_sequence(src_stentences, batch_first=self.batch_first,
-                                                      padding_value=self.pad_value)
+                                                      padding_value=self.src_pad_value)
         padded_trg_stentences_forward = pad_sequence(trg_stentences_forward, batch_first=self.batch_first,
-                                                      padding_value=self.pad_value)
+                                                      padding_value=self.trg_pad_value)
         padded_trg_stentences_loss = pad_sequence(trg_stentences_loss, batch_first=self.batch_first,
-                                                      padding_value=self.pad_value)
+                                                      padding_value=self.trg_pad_value)
         return padded_src_stentences, padded_trg_stentences_forward, padded_trg_stentences_loss
     
 
