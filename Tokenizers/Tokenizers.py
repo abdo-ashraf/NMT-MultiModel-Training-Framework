@@ -2,7 +2,7 @@ import sentencepiece as spm
 import pandas as pd
 ## requirements
 # !pip -q install sentencepiece
-
+## source is english and traget is arabic.
 
 def train(train_csv_path:str, src_lang_tokenizer_params:dict, trg_lang_tokenizer_params:dict):
   print("Starting Tokenizers Train...")
