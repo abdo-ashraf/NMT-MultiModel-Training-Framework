@@ -95,7 +95,7 @@ def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str
     model_path = os.path.join(save_dir, f"{run_name}_step_{step}.pth")
     if in_onnx:
         ## onnx
-        print("Converting To ONNX framework...")
+        print("Saving in Onnx format not supported for now.")
     else:
         ## pytorch
         torch.save({'model_state_dict': model.state_dict(),
