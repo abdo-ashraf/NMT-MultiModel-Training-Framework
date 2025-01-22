@@ -1,0 +1,35 @@
+Future Work for the Project
+    1. Enhance Evaluation Metrics:
+        - Integrate BLEU score evaluation for a better assessment of translation quality.
+        - Include other relevant metrics like ROUGE or METEOR for comprehensive evaluation.
+
+    2. Improve Model Compilation:
+        - Resolve issues with torch.compile when enabled to leverage PyTorch's optimized compilation pipeline.
+
+    3. Scheduler Enhancements:
+        - Implement warmup and cosine learning rate scheduler for better convergence and stability during training.
+    
+    4. Optimize Transformer Models:
+        - Add support for Flash Attention to enhance efficiency and speed in transformer-based models.
+    
+    5. ONNX Model Support:
+        - Enable saving models in ONNX format when in_onnx is set to True for deployment in various platforms.
+
+    6. Experiment Tracking:
+        - Integrate MLflow for experimental tracking, providing better insights into training, validation, and hyperparameter tuning.
+
+    7. Test Set Evaluation:
+        - Add functionality for evaluation of the model on a test set to ensure performance consistency.
+
+    8. Inference Improvements:
+        - Implement beam search decoding during inference for improved translation quality.
+
+    9. Mixed Precision Training:
+        - Incorporate mixed precision training to reduce memory usage and speed up computation. (Done)
+
+    10. Hyperparameter Optimization:
+        - hyperparameter tuning to find the best configuration.
+
+    11. Model Deployment:
+        - Include utilities for exporting and deploying models.
+
