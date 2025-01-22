@@ -1,8 +1,8 @@
 import os
 import torch
+from tqdm import tqdm
 from .TrainingArguments import TrainingArguments
-from utils.data_utils import MT_Dataset, MYCollate
-from utils.model_utils import training_loop, plot_loss
+from utils import MT_Dataset, MYCollate, save_checkpoint, plot_loss
 from torch.utils.data import DataLoader
 
 
@@ -34,11 +34,10 @@ class Trainer():
                                   generator=self.generator,
                                   pin_memory=self.args.pin_memory)
 
-    def train(self):
+    def train(self, src_pad_tokenId=None, trg_pad_tokenId=None):
 
-        print("Starting Model Training...")
-        class_criterion = torch.nn.CrossEntropyLoss(ignore_index=self.collator.pad_value)  # Classification loss
-        if hasattr(self.model, 'maxlen'):
+        print(f"Start Training {self.model.__class__.__name__} model...")
+        if src_pad_tokenId:
             print('AdamW will be used for Transformer-based models')
             optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         else:
@@ -46,30 +45,94 @@ class Trainer():
             optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
 
         if self.args.torch_compile:
+            print(f"Compiling the model using torch.compile...")
             self.model = torch.compile(self.model)
-            
-        train_class_losses, val_class_losses = training_loop(model=self.model,
-                                                            criterion=class_criterion,
-                                                            optimizer=optimizer,
-                                                            train_loader=self.train_loader,
-                                                            valid_loader=self.valid_loader,
-                                                            epochs=self.args.num_train_epochs,
-                                                            device=self.args.device)
+            print(f"model Compilation done.")
+
+        if self.args.precision == 'high':
+            print("Using BF16")     
+        else: 
+            print("Using TF16")
+
+        train_losses = []
+        valid_losses = []
+        valid_metric = []
+        steps = []
+        step=0
+        train_loader_iter = iter(self.train_loader)  # Create an iterator for the train_loader
+
+        tqdm_loop = tqdm(total=self.args.max_steps, position=0)
+        while step < self.args.max_steps:
+            self.model.train()  # Set the model to training mode
+            try:
+                # Get the next batch
+                data, labels_forward, labels_loss = next(train_loader_iter)
+            except StopIteration:
+                # Reinitialize the iterator when all batches are consumed
+                train_loader_iter = iter(self.train_loader)
+                data, labels_forward, labels_loss = next(train_loader_iter)
+            # Get data
+            data = data.to(self.args.device)
+            labels_forward = labels_forward.to(self.args.device)
+            labels_loss = labels_loss.to(self.args.device)
+            # Forward
+            if self.args.precision == 'high':
+                with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
+                    logits, loss = self.model(data, labels_forward, labels_loss, src_pad_tokenId=src_pad_tokenId, trg_pad_tokenId=trg_pad_tokenId)
+            else:
+                logits, loss = self.model(data, labels_forward, labels_loss, src_pad_tokenId=src_pad_tokenId, trg_pad_tokenId=trg_pad_tokenId)
+
+            # Backward
+            optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+            optimizer.step()
+
+            # Update step
+            step += 1
+            tqdm_loop.update(1)
+            tqdm_loop.set_description(f"Step [{step}/{self.args.max_steps}]")
+            tqdm_loop.set_postfix_str(f'loss = {round(loss.item(), 4)}')
+
+
+            if step % self.args.eval_steps == 0 or step == self.args.max_steps:
+                train_losses.append(loss.item())
+                steps.append(step)
+                val_loss = self.evaluate(compute_metric_fn=self.compute_metrics_func)
+                valid_losses.append(val_loss)
+                print(f'Validation: Loss {val_loss:.4f}, Bleu Score (future work)%')
+                
+            # Save model at specific intervals
+            if step % self.args.save_steps == 0 or step == self.args.max_steps:
+                save_checkpoint(model=self.model,
+                                optimizer=optimizer,
+                                save_dir=self.args.save_models_dir,
+                                run_name=self.args.run_name,
+                                step=step,
+                                in_onnx=self.args.onnx)
+
+        tqdm_loop.close()
         print("Model Training Done.")
 
-        plot_loss(train_class_losses, val_class_losses, self.args.save_plots_dir, self.args.run_name)
+        plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)
 
-        ## Save Entire Model
-        model_path = os.path.join(self.args.save_models_dir, self.args.run_name)
-        if self.args.onnx:
-            print("Converting To ONNX framework...")
-            ## onnx
-        else:
-            ## pytorch
-            torch.save({'epoch': self.args.num_train_epochs,
-                        'model_state_dict': self.model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        "Training losses": train_class_losses,
-                        "Validation losses": val_class_losses}, f"{model_path}.pth")
+        return train_losses, valid_losses
+    
 
-        return train_class_losses, val_class_losses
+    @torch.no_grad()
+    def evaluate(self, compute_metric_fn):
+        self.model.eval()
+
+        total_loss = 0
+        
+        for data, labels_forward, labels_loss in self.valid_loader:
+            data = data.to(self.args.device)
+            labels_forward = labels_forward.to(self.args.device)
+            labels_loss = labels_loss.to(self.args.device)
+
+            class_logits, item_total_loss = self.model(data, labels_forward, labels_loss)
+            total_loss += item_total_loss.item()
+
+        avg_loss = total_loss / len(self.valid_loader)
+
+        return avg_loss 

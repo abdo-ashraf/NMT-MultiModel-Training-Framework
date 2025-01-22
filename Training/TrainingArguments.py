@@ -31,8 +31,8 @@ class TrainingArguments:
         self.learning_rate = config.get("learning_rate")
         assert isinstance(self.learning_rate, float), "learning_rate must be a float."
 
-        self.num_train_epochs = config.get("num_train_epochs")
-        assert isinstance(self.num_train_epochs, int), "num_train_epochs must be an integer."
+        self.max_steps = config.get("max_steps")
+        assert isinstance(self.max_steps, int), "max_steps must be an integer."
 
         self.seed = config.get("seed")
         assert isinstance(self.seed, int), "seed must be an integer."
@@ -52,9 +52,6 @@ class TrainingArguments:
         self.weight_decay = config.get("weight_decay")
         assert isinstance(self.weight_decay, float), "weight_decay must be a float."
 
-        self.maxlen = config.get("maxlen")
-        assert isinstance(self.maxlen, int), "maxlen must be an integer."
-
         self.onnx = config.get("onnx")
         assert isinstance(self.onnx, bool), "onnx must be a boolean."
 
@@ -64,11 +61,14 @@ class TrainingArguments:
         self.pin_memory = config.get("pin_memory")
         assert isinstance(self.pin_memory, bool), "pin_memory must be a boolean."
 
-        self.warmup_epochs = config.get("warmup_epochs")
-        assert isinstance(self.warmup_epochs, int), "warmup_epochs must be an integer."
+        self.warmup_steps = config.get("warmup_steps")
+        assert isinstance(self.warmup_steps, int), "warmup_steps must be an integer."
 
-        self.save_epochs = config.get("save_epochs")
-        assert isinstance(self.save_epochs, int), "save_epochs must be an integer."
+        self.save_steps = config.get("save_steps")
+        assert isinstance(self.save_steps, int), "save_steps must be an integer."
+
+        self.eval_steps = config.get("eval_steps")
+        assert isinstance(self.eval_steps, int), "eval_steps must be an integer."
 
         self.torch_compile = config.get("torch_compile")
         assert isinstance(self.torch_compile, bool), "torch_compile must be a boolean."
@@ -85,18 +85,18 @@ class TrainingArguments:
                 f"  save_models_dir='{self.save_models_dir}',\n" +
                 f"  save_plots_dir='{self.save_plots_dir}',\n" +
                 f"  learning_rate={self.learning_rate},\n" +
-                f"  num_train_epochs={self.num_train_epochs},\n" +
+                f"  max_steps={self.max_steps},\n" +
                 f"  seed={self.seed},\n" +
                 f"  precision='{self.precision}',\n" +
                 f"  device='{self.device}',\n" +
                 f"  batch_size={self.batch_size},\n" +
                 f"  cpu_num_workers={self.cpu_num_workers},\n" +
                 f"  weight_decay={self.weight_decay},\n" +
-                f"  maxlen={self.maxlen},\n" +
                 f"  onnx={self.onnx},\n" +
                 f"  run_name='{self.run_name}',\n" +
                 f"  pin_memory={self.pin_memory},\n" +
-                f"  warmup_epochs={self.warmup_epochs},\n" +
-                f"  save_epochs={self.save_epochs},\n" +
+                f"  warmup_steps={self.warmup_steps},\n" +
+                f"  save_steps={self.save_steps},\n" +
+                f"  eval_steps={self.eval_steps},\n" +
                 f"  torch_compile={self.torch_compile}\n" +
                 ")")
