@@ -9,13 +9,16 @@ from torch.utils.data import DataLoader
 class Trainer():
     def __init__(self, args:TrainingArguments, model:torch.nn.Module,
                  train_ds:MT_Dataset, valid_ds:MT_Dataset,
-                 collator:MYCollate, compute_metrics_func):
+                 collator:MYCollate, src_pad_tokenId:int, trg_pad_tokenId:int,
+                 compute_metrics_func):
         self.args = args
         self.model = model.to(self.args.device)
         self.train_ds = train_ds
         self.valid_ds = valid_ds
         self.collator = collator
         self.compute_metrics_func = compute_metrics_func
+        self.src_pad_tokenId = src_pad_tokenId
+        self.trg_pad_tokenId = trg_pad_tokenId
 
         self.generator = torch.manual_seed(self.args.seed) if self.args.seed else None
         self.train_loader = DataLoader(self.train_ds,
@@ -34,7 +37,7 @@ class Trainer():
                                   generator=self.generator,
                                   pin_memory=self.args.pin_memory)
 
-    def train(self, src_pad_tokenId=None, trg_pad_tokenId=None):
+    def train(self):
 
         print(f"Start Training {self.model.__class__.__name__} model...")
         print(f'AdamW optimizer will be used will learning_rate={self.args.learning_rate}, weight_decay={self.args.weight_decay}')
@@ -74,9 +77,17 @@ class Trainer():
             # Forward
             if self.args.precision == 'high':
                 with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
-                    logits, loss = self.model(data, labels_forward, labels_loss, src_pad_tokenId=src_pad_tokenId, trg_pad_tokenId=trg_pad_tokenId)
+                    logits, loss = self.model(data,
+                                              labels_forward,
+                                              labels_loss,
+                                              src_pad_tokenId=self.src_pad_tokenId,
+                                              trg_pad_tokenId=self.trg_pad_tokenId)
             else:
-                logits, loss = self.model(data, labels_forward, labels_loss, src_pad_tokenId=src_pad_tokenId, trg_pad_tokenId=trg_pad_tokenId)
+                logits, loss = self.model(data,
+                                          labels_forward,
+                                          labels_loss,
+                                          src_pad_tokenId=self.src_pad_tokenId,
+                                          trg_pad_tokenId=self.trg_pad_tokenId)
 
             # Backward
             optimizer.zero_grad()
@@ -126,7 +137,20 @@ class Trainer():
             labels_forward = labels_forward.to(self.args.device)
             labels_loss = labels_loss.to(self.args.device)
 
-            class_logits, item_total_loss = self.model(data, labels_forward, labels_loss)
+            if self.args.precision == 'high':
+                with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
+                    class_logits, item_total_loss = self.model(data,
+                                                               labels_forward,
+                                                               labels_loss,
+                                                               src_pad_tokenId=self.src_pad_tokenId,
+                                                               trg_pad_tokenId=self.trg_pad_tokenId)
+            else:
+                class_logits, item_total_loss = self.model(data,
+                                                           labels_forward,
+                                                           labels_loss,
+                                                           src_pad_tokenId=self.src_pad_tokenId,
+                                                           trg_pad_tokenId=self.trg_pad_tokenId)
+
             total_loss += item_total_loss.item()
 
         avg_loss = total_loss / len(self.valid_loader)

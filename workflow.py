@@ -66,7 +66,10 @@ if __name__ == '__main__':
                           trg_sentences_list=valid_df[valid_df.columns[1]].to_list(),
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     
-    mycollate = MYCollate(batch_first=True, pad_value=trg_tokenizer.get_tokenId('<pad>'))
+    mycollate = MYCollate(batch_first=True,
+                          src_pad_value=src_tokenizer.get_tokenId('<pad>'),
+                          trg_pad_value=trg_tokenizer.get_tokenId('<pad>'))
+    
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
     print(f"Source tokens shape: {train_ds[3][0].shape}, Target_forward shape {train_ds[3][1].shape}, Target_loss shape {train_ds[3][2].shape}")
     print("Data Loading Done.")
@@ -94,6 +97,8 @@ if __name__ == '__main__':
     trainer = Trainer(args=training_args, model=model,
                       train_ds=train_ds, valid_ds=valid_ds,
                       collator=mycollate,
+                      src_pad_tokenId=mycollate.src_pad_value,
+                      trg_pad_tokenId=mycollate.trg_pad_value,
                       compute_metrics_func=compute_bleu)
 
     train_losses, valid_losses = trainer.train()
