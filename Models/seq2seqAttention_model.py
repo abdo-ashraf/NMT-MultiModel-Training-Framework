@@ -51,7 +51,6 @@ class Attention(nn.Module):
 
 
 
-
 class Decoder(nn.Module):
     def __init__(self, vocab_size, dim_embed, dim_hidden, attention, num_layers, dropout_probability):
         super().__init__()
@@ -84,20 +83,24 @@ class Seq2seq_with_attention(nn.Module):
         self.decoder = Decoder(decoder_vocab_size, dim_embed, dim_model, self.attention, num_layers, dropout_probability)
         self.classifier = nn.Linear(dim_model, decoder_vocab_size)
 
-    def forward(self, x:torch.tensor, y:torch.tensor, teacher_force_ratio=0.5):
-        B, T = y.size()
-        total_outputs = torch.zeros(B, T, self.decoder_vocab_size, device=x.device)
-        context, hidden = self.encoder(x)
+    def forward(self, source, target_forward, target_loss=None, src_pad_tokenId=None, trg_pad_tokenId=None):
+        # target_forward = traget but without eos token (end of sentence) and will be used in model forward path
+        # target_loss = traget but without sos token (start of sentence) will be used in loss calculations as the True label
+        teacher_force_ratio = 0.5
+        B, T = target_forward.size()
+        total_outputs = torch.zeros(B, T, self.decoder_vocab_size, device=source.device)
+        context, hidden = self.encoder(source)
         hidden = hidden.unsqueeze(0).repeat(self.num_layers,1,1) # (numlayer, B, dim_model)
-        step_token = y[:, [0]]
+        step_token = target_forward[:, [0]]
         for step in range(1, T):
             out, hidden, alphas = self.decoder(step_token, context, hidden)
-            logits = self.classifier(out)
-            total_outputs[:, step] = logits.squeeze(1)
+            logits = self.classifier(out).squeeze(1)
+            total_outputs[:, step] = logits
             top1 = logits.argmax(-1, keepdim=True)
-            x = y[:, [step]] if teacher_force_ratio > random.random() else top1
+            step_token = target_forward[:, [step]] if teacher_force_ratio > random.random() else top1
 
-        return total_outputs
+        loss = nn.functional.cross_entropy(total_outputs.view(-1, total_outputs.size(-1)), target_loss.view(-1)) if target_loss is not None else None
+        return total_outputs, loss
     
     @torch.no_grad
     def translate(self, source:torch.Tensor, trg_sos_tokenId: int, trg_eos_tokenId:int, max_tries=100):

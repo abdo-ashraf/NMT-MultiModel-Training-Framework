@@ -54,23 +54,26 @@ class Seq2seq_no_attention(nn.Module):
         self.decoder = Decoder(decoder_vocab_size, dim_embed, dim_model, num_layers, dropout_probability)
         self.classifier = nn.Linear(dim_model, decoder_vocab_size)
 
-    def forward(self, source, target, teacher_force_ratio=0.5):
-
-        B, T = target.size()
+    def forward(self, source, target_forward, target_loss=None, src_pad_tokenId=None, trg_pad_tokenId=None):
+        # target_forward = traget but without eos token (end of sentence) and will be used in model forward path
+        # target_loss = traget but without sos token (start of sentence) will be used in loss calculations as the True label
+        teacher_force_ratio = 0.5
+        B, T = target_forward.size()
         total_outputs = torch.zeros(B, T, self.decoder_vocab_size, device=source.device) # (B,T,vocab_size)
 
         context = self.encoder(source) # (B, dim_model)
         ## We will pass the hiddens for each layer of the decoder (inspired by Attention is all you need paper)
         context = context.unsqueeze(0).repeat(self.num_layers,1,1) # (numlayer, B, dim_model)
-        x = target[:, [0]]
+        step_token = target_forward[:, [0]]
         for step in range(1, T):
-            out, context = self.decoder(x, context)
+            out, context = self.decoder(step_token, context)
             logits = self.classifier(out)
             total_outputs[:, step] = logits
             top1 = logits.argmax(-1, keepdim=True)
-            x = target[:, [step]] if teacher_force_ratio > random.random() else top1
+            step_token = target_forward[:, [step]] if teacher_force_ratio > random.random() else top1
 
-        return total_outputs
+        loss = nn.functional.cross_entropy(total_outputs.view(-1, total_outputs.size(-1)), target_loss.view(-1)) if target_loss is not None else None
+        return total_outputs, loss
     
     @torch.no_grad
     def translate(self, source:torch.Tensor, trg_sos_tokenId: int, trg_eos_tokenId:int, max_tries=100):

@@ -26,7 +26,7 @@ class NMT_Transformer(nn.Module):
                                                    dim_feedforward=dim_feedforward,
                                                    dropout=dropout_probability,
                                                    batch_first=True, norm_first=True)
-        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
+        self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
         
         self.classifier = nn.Linear(dim_model, decoder_vocab_size)
         self.maxlen = maxlen
@@ -43,9 +43,11 @@ class NMT_Transformer(nn.Module):
             torch.nn.init.ones_(module.weight)
             torch.nn.init.zeros_(module.bias)
     
-    def forward(self, source, target, src_pad_tokenId=None, trg_pad_tokenId=None):
+    def forward(self, source, target_forward, target_loss=None, src_pad_tokenId=None, trg_pad_tokenId=None):
+        # target_forward = traget but without eos token (end of sentence) and will be used in model forward path
+        # target_loss = traget but without sos token (start of sentence) will be used in loss calculations as the True label
         B, Ts = source.shape
-        B, Tt = target.shape
+        B, Tt = target_forward.shape
         device = source.device
         ## Encoder Path
         src_poses = self.src_pos(torch.arange(0, Ts).to(device).unsqueeze(0).repeat(B, 1))
@@ -55,9 +57,9 @@ class NMT_Transformer(nn.Module):
         memory = self.transformer_encoder(src=src_embedings, mask=None, src_key_padding_mask=src_pad_mask, is_causal=False)
         ## Decoder Path
         trg_poses = self.trg_pos(torch.arange(0, Tt).to(device).unsqueeze(0).repeat(B, 1))
-        trg_embedings = self.dropout(self.trg_embed(target) + trg_poses)
+        trg_embedings = self.dropout(self.trg_embed(target_forward) + trg_poses)
         
-        trg_pad_mask = target == trg_pad_tokenId if trg_pad_tokenId is not None else None
+        trg_pad_mask = target_forward == trg_pad_tokenId if trg_pad_tokenId is not None else None
         tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(Tt, dtype=bool).to(device)
         decoder_out = self.transformer_decoder.forward(tgt=trg_embedings,
                                                 memory=memory,
@@ -67,12 +69,13 @@ class NMT_Transformer(nn.Module):
                                                 memory_key_padding_mask=None)
         ## Classifier Path
         logits = self.classifier(decoder_out)
+        loss = nn.functional.cross_entropy(logits.view(-1, logits.size(-1)), target_loss.view(-1)) if target_loss is not None else None
 
         # return logits, decoder_out, tgt_mask, trg_pad_mask, memory, src_pad_mask, src_poses, src_embedings, trg_poses, trg_embedings
-        return logits
+        return logits, loss
     
     @torch.no_grad
-    def translate(self, source: torch.Tensor, trg_sos_tokenId: int, trg_eos_tokenId:int, max_tries=100):
+    def translate(self, source:torch.Tensor, trg_sos_tokenId: int, trg_eos_tokenId:int, max_tries=100):
         """
         Translates a source sequence into a target sequence using greedy decoding.
         """
@@ -83,8 +86,8 @@ class NMT_Transformer(nn.Module):
         trg_tokens = torch.tensor([trg_sos_tokenId]).unsqueeze(0).to(device)
 
         for _ in range(max_tries):
-            logits = self.forward(source=source, target=trg_tokens)[:, -1, :]
-            next_token = logits.argmax(dim=-1, keepdim=True)  # Greedy decoding
+            logits, loss = self.forward(source=source, target_forward=trg_tokens)
+            next_token = logits[:,-1,:].argmax(dim=-1, keepdim=True)  # Greedy decoding
             # Append predicted token
             trg_tokens = torch.cat([trg_tokens, next_token], dim=1)
 
