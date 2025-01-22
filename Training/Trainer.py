@@ -37,12 +37,8 @@ class Trainer():
     def train(self, src_pad_tokenId=None, trg_pad_tokenId=None):
 
         print(f"Start Training {self.model.__class__.__name__} model...")
-        if src_pad_tokenId:
-            print('AdamW will be used for Transformer-based models')
-            optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
-        else:
-            print('Adam will be used for non-Transformer models')
-            optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        print(f'AdamW optimizer will be used will learning_rate={self.args.learning_rate}, weight_decay={self.args.weight_decay}')
+        optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
 
         if self.args.torch_compile:
             print(f"Compiling the model using torch.compile...")
