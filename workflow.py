@@ -58,12 +58,12 @@ if __name__ == '__main__':
     train_df = pd.read_csv(args.train_csv_path)
     valid_df = pd.read_csv(args.valid_csv_path)
 
-    train_ds = MT_Dataset(src_sentences_list=train_df[train_df.columns[0]].to_list(),
-                          trg_sentences_list=train_df[train_df.columns[1]].to_list(),
+    train_ds = MT_Dataset(src_sentences_list=train_df['source_lang'].to_list(),
+                          trg_sentences_list=train_df['target_lang'].to_list(),
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     
-    valid_ds = MT_Dataset(src_sentences_list=valid_df[valid_df.columns[0]].to_list(),
-                          trg_sentences_list=valid_df[valid_df.columns[1]].to_list(),
+    valid_ds = MT_Dataset(src_sentences_list=valid_df['source_lang'].to_list(),
+                          trg_sentences_list=valid_df['target_lang'].to_list(),
                           src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
     
     mycollate = MYCollate(batch_first=True,
