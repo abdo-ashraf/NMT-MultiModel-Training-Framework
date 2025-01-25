@@ -105,9 +105,9 @@ class Trainer():
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
                     train_losses.append(loss.item())
                     steps.append(step)
-                    val_loss = self.evaluate(compute_metric_fn=self.compute_metrics_func)
+                    val_loss, valid_metric = self.evaluate(compute_metric_fn=self.compute_metrics_func)
                     valid_losses.append(val_loss)
-                    print(f'Validation: Loss {val_loss:.4f}, Bleu Score (future work)%')
+                    print(f'Validation step-{step}: Loss {val_loss:.4f}, Bleu Score {valid_metric:.4f}%')
                     self.model = self.model.train()
                 
             # Save model at specific intervals
@@ -129,7 +129,7 @@ class Trainer():
     
 
     @torch.no_grad()
-    def evaluate(self, compute_metric_fn):
+    def evaluate(self):
         self.model = self.model.eval()
 
         total_loss = 0
@@ -153,8 +153,10 @@ class Trainer():
                                                            src_pad_tokenId=self.src_pad_tokenId,
                                                            trg_pad_tokenId=self.trg_pad_tokenId)
 
+            candidates = torch.argmax(class_logits, dim=-1)
+            total_metric = self.compute_metrics_func(labels_loss, candidates)
             total_loss += item_total_loss.item()
 
         avg_loss = total_loss / len(self.valid_loader)
-
-        return avg_loss 
+        avg_metric = total_metric / len(self.valid_loader)
+        return avg_loss, avg_metric

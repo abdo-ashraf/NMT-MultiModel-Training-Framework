@@ -4,7 +4,7 @@ from torch.nn.utils.rnn import pad_sequence
 from Tokenizers.Tokenizers import Callable_tokenizer
 import matplotlib.pyplot as plt
 import os
-from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 
 ## Dataset
@@ -104,8 +104,16 @@ def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str
     print(f"Checkpoint saved at: {model_path}")
 
 
-def compute_bleu(references, candidate):
-    if type(references[0]) != list:
-        references = [references]
-    bleu = sentence_bleu(references, candidate)
-    return  bleu
+def compute_bleu(references:torch.Tensor, candidates:torch.Tensor):
+    batch_size = candidates.size(0)
+    total_bleu = 0
+    smoothing = SmoothingFunction().method2  # Use smoothing to handle zero n-gram overlaps
+    for i in range(batch_size):
+        mask_i = references[i]!=0
+        candidate = candidates[i][mask_i].tolist()
+        references_one = [references[i][mask_i].tolist()]
+        bleu_score = sentence_bleu(references_one, candidate, weights=[0.33,0.33,0.33,0.0], smoothing_function=smoothing)
+        # print(round(bleu_score, 4))
+        total_bleu += bleu_score
+    
+    return  total_bleu / batch_size
