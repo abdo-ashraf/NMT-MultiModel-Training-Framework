@@ -27,7 +27,7 @@ class NMT_Transformer(nn.Module):
                                                    dim_feedforward=dim_feedforward,
                                                    dropout=dropout_probability,
                                                    batch_first=True, norm_first=True,
-                                                   activation=nn.functional.selu())
+                                                   activation=nn.functional.selu)
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
         
         self.classifier = nn.Linear(dim_model, vocab_size)
