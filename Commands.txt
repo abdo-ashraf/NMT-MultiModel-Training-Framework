@@ -1,6 +1,6 @@
 python ./make_data/data_workflow.py --out_dir './out/' --data 'both' --maxlen 25 --seed 123 --valid_test_split 0.3
 
-python ./Tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/df_train.csv --config_path ./Configurations/tokenizers_config.json
+python ./Tokenizers/tokenizers_workflow.py --train_csv_path ./out/data/ar-en_train.csv --config_path ./Configurations/tokenizers_config.json --train_on_columns ['ar', 'en']
 
-python ./workflow.py --train_csv_path out/data/df_train.csv --valid_csv_path out/data/df_valid.csv --src_tokenizer_path out/tokenizers/src_tokenizer.model --trg_tokenizer_path out/tokenizers/trg_tokenizer.model --model_config_path Configurations/model_config.json --training_config_path Configurations/training_config.json
+python ./workflow.py --train_csv_path out/data/ar-en_train.csv --valid_csv_path out/data/ar-en_valid.csv --tokenizer_path out/tokenizers/ar-en_tokenizer.model --model_config_path Configurations/model_config.json --training_config_path Configurations/training_config.json
 

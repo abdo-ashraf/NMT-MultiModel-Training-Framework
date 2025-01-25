@@ -54,19 +54,19 @@ if __name__ == '__main__':
     train_df = pd.read_csv(args.train_csv_path)
     valid_df = pd.read_csv(args.valid_csv_path)
 
-    train_ds = MT_Dataset(input_sentences_list=train_df['source_lang'].to_list(),
-                          target_sentences_list=train_df['target_lang'].to_list(),
-                          callable_tokenizer=tokenizer)
-    
-    valid_ds = MT_Dataset(input_sentences_list=valid_df['source_lang'].to_list(),
-                          target_sentences_list=valid_df['target_lang'].to_list(),
-                          callable_tokenizer=tokenizer)
-    
+    train_ds = MT_Dataset(input_sentences_list=train_df['ar'].to_list(),
+                            target_sentences_list=train_df['en'].to_list(),
+                            callable_tokenizer=tokenizer)
+
+    valid_ds = MT_Dataset(input_sentences_list=valid_df['ar'].to_list(),
+                            target_sentences_list=valid_df['en'].to_list(),
+                            callable_tokenizer=tokenizer)
+
     mycollate = MyCollate(batch_first=True,
-                          pad_value=Callable_tokenizer.get_tokenId('<pad>'))
-    
+                            pad_value=tokenizer.get_tokenId('<pad>'))
+
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
-    print(f"Source tokens shape: {train_ds[0][0].shape}, Target_fwd tokens shape {train_ds[0][1].shape}, Target_loss tokens shape {train_ds[0][1].shape}")
+    print(f"Source tokens shape: {train_ds[0][0].shape}, Target_fwd tokens shape {train_ds[0][1].shape}, Target_loss tokens shape {train_ds[0][2].shape}")
     print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")
@@ -89,11 +89,8 @@ if __name__ == '__main__':
 
     print("---------------------Start training...---------------------")
     trainer = Trainer(args=training_args, model=model,
-                      train_ds=train_ds, valid_ds=valid_ds,
-                      collator=mycollate,
-                      src_pad_tokenId=mycollate.src_pad_value,
-                      trg_pad_tokenId=mycollate.trg_pad_value,
-                      compute_metrics_func=compute_bleu)
+                        train_ds=train_ds, valid_ds=valid_ds,
+                        collator=mycollate, compute_metrics_func=compute_bleu)
 
     train_losses, valid_losses = trainer.train()
     print("Training Done.")

@@ -136,17 +136,15 @@ class Trainer():
 
             if self.args.precision == 'high':
                 with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
-                    class_logits, item_total_loss = self.model(data,
-                                                               labels_forward,
-                                                               labels_loss,
-                                                               src_pad_tokenId=self.src_pad_tokenId,
-                                                               trg_pad_tokenId=self.trg_pad_tokenId)
+                    class_logits, item_total_loss = self.model(source=data,
+                                                               target_forward=labels_forward,
+                                                               pad_tokenId=self.collator.pad_value,
+                                                               target_loss=labels_loss)
             else:
-                class_logits, item_total_loss = self.model(data,
-                                                           labels_forward,
-                                                           labels_loss,
-                                                           src_pad_tokenId=self.src_pad_tokenId,
-                                                           trg_pad_tokenId=self.trg_pad_tokenId)
+                class_logits, item_total_loss = self.model(source=data,
+                                                           target_forward=labels_forward,
+                                                           pad_tokenId=self.collator.pad_value,
+                                                           target_loss=labels_loss)
 
             candidates = torch.argmax(class_logits, dim=-1)
             total_metric = self.compute_metrics_func(labels_loss, candidates)
