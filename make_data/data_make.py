@@ -17,13 +17,13 @@ def download_data(data_type):
     datas = []
     if data_type.lower() == 'both' or data_type.lower() == 'opus':
         ds_opus = load_dataset("Helsinki-NLP/opus-100", "ar-en")
-        df_opus = pd.DataFrame(ds_opus['train']['translation']).rename(columns={'en': 'source_lang', 'ar': 'target_lang',})
+        df_opus = pd.DataFrame(ds_opus['train']['translation'])#.rename(columns={'en': 'en', 'ar': 'ar',})
         datas.append(df_opus)
 
     if data_type.lower() == 'both' or data_type.lower() == 'covo':
         ds_covo = load_dataset("ymoslem/CoVoST2-EN-AR", "ar-en", columns=['sentence', 'translation'])
         ds_covo = concatenate_datasets([ds_covo['train'], ds_covo['validation'], ds_covo['test']])
-        df_covo = pd.DataFrame(ds_covo).rename(columns={'translation': 'source_lang', 'sentence': 'target_lang',})
+        df_covo = pd.DataFrame(ds_covo).rename(columns={'translation': 'en', 'sentence': 'ar',})
         datas.append(df_covo)
 
     return pd.concat(datas, axis=0, ignore_index=True)
@@ -54,15 +54,15 @@ def pre_plot(plots_dir, df_data):
     # Create a figure and two subplots
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-    # Plot histogram for source_lang_length
-    axes[0].hist(df_data['source_lang_length'], bins=100, color='skyblue', edgecolor='black')
-    axes[0].set_title('Source Languange sentence Length')
+    # Plot histogram for en_length
+    axes[0].hist(df_data['en_length'], bins=100, color='skyblue', edgecolor='black')
+    axes[0].set_title('en Languange sentence Length')
     axes[0].set_xlabel('Length')
     axes[0].set_ylabel('Frequency')
     
-    # Plot histogram for target_lang_length
-    axes[1].hist(df_data['target_lang_length'], bins=100, color='salmon', edgecolor='black')
-    axes[1].set_title('Target Languange sentence Length')
+    # Plot histogram for ar_length
+    axes[1].hist(df_data['ar_length'], bins=100, color='salmon', edgecolor='black')
+    axes[1].set_title('ar Languange sentence Length')
     axes[1].set_xlabel('Length')
     axes[1].set_ylabel('Frequency')
     
@@ -77,31 +77,31 @@ def drop(df_data, maxlen):
     ### Personal effort (No Reference)
     indices_to_drop = []
 
-    idx = (df_data[(df_data['target_lang_length'].isin([1])) | 
-                    (df_data['source_lang_length'] == 1)]).index
+    idx = (df_data[(df_data['ar_length'].isin([1])) | 
+                    (df_data['en_length'] == 1)]).index
     indices_to_drop += list(idx)
 
-    idx = df_data[(df_data['source_lang_length'] > maxlen) | 
-                    (df_data['target_lang_length'] > maxlen)].index
+    idx = df_data[(df_data['en_length'] > maxlen) | 
+                    (df_data['ar_length'] > maxlen)].index
     indices_to_drop += list(idx)
 
-    idx = (df_data[(df_data['target_lang_length'].isin([2])) & 
-                (df_data['source_lang_length'] > 7)]).index
+    idx = (df_data[(df_data['ar_length'].isin([2])) & 
+                (df_data['en_length'] > 7)]).index
     indices_to_drop += list(idx)
 
-    idx = (df_data[(df_data['target_lang_length'].isin([3])) & 
-                (df_data['source_lang_length'] > 12)]).index
+    idx = (df_data[(df_data['ar_length'].isin([3])) & 
+                (df_data['en_length'] > 12)]).index
     indices_to_drop += list(idx)
 
-    idx = (df_data[abs(df_data['target_lang_length'] - df_data['source_lang_length']) > 10]).index
+    idx = (df_data[abs(df_data['ar_length'] - df_data['en_length']) > 10]).index
     indices_to_drop += list(idx)
 
     indices_to_drop = list(set(indices_to_drop)) + [681448, 503657]
 
     filtered_data = df_data.drop(indices_to_drop).reset_index(drop=True)
 
-    # df_data = df_data.drop_duplicates(keep='first', subset='target_lang')
-    filtered_data = filtered_data.drop_duplicates(keep='first', subset='source_lang')
+    # df_data = df_data.drop_duplicates(keep='first', subset='ar')
+    filtered_data = filtered_data.drop_duplicates(keep='first', subset='en')
 
     filtered_data = filtered_data.replace('', pd.NA).dropna()
     filtered_data = filtered_data.replace(' ', pd.NA).dropna()
@@ -115,19 +115,19 @@ def post_plot(plots_dir, filtered_data):
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
     # Define custom tick range based on your data range
-    EN_x_ticks = np.arange(0, filtered_data['source_lang_length'].max()+1, 2)
-    AR_x_ticks = np.arange(0, filtered_data['target_lang_length'].max()+1, 2)
+    EN_x_ticks = np.arange(0, filtered_data['en_length'].max()+1, 2)
+    AR_x_ticks = np.arange(0, filtered_data['ar_length'].max()+1, 2)
 
-    # Plot histogram for source_lang_length
-    axes[0].hist(filtered_data['source_lang_length'], bins=50, color='skyblue', edgecolor='black')
-    axes[0].set_title('Source Languange sentence Length')
+    # Plot histogram for en_length
+    axes[0].hist(filtered_data['en_length'], bins=50, color='skyblue', edgecolor='black')
+    axes[0].set_title('en Languange sentence Length')
     axes[0].set_xlabel('Length')
     axes[0].set_ylabel('Frequency')
     axes[0].set_xticks(EN_x_ticks)  # Add more x-axis ticks
 
-    # Plot histogram for target_lang_length
-    axes[1].hist(filtered_data['target_lang_length'], bins=50, color='salmon', edgecolor='black')
-    axes[1].set_title('Target Languange sentence Length')
+    # Plot histogram for ar_length
+    axes[1].hist(filtered_data['ar_length'], bins=50, color='salmon', edgecolor='black')
+    axes[1].set_title('ar Languange sentence Length')
     axes[1].set_xlabel('Length')
     axes[1].set_ylabel('Frequency')
     axes[1].set_xticks(AR_x_ticks)  # Add more x-axis ticks
@@ -147,10 +147,10 @@ def make_data(out_dir, data_type, maxlen, valid_test_split, seed):
     os.makedirs(plots_out_dir, exist_ok=True)
 
     df_data = download_data(data_type)
-    df_data['source_lang'] = df_data['source_lang'].apply(clean_en)
-    df_data['target_lang'] = df_data['target_lang'].apply(clean_ar)
-    df_data['source_lang_length'] = df_data['source_lang'].apply(lambda x: len(x.split(' ')))
-    df_data['target_lang_length'] = df_data['target_lang'].apply(lambda x: len(x.split(' ')))
+    df_data['en'] = df_data['en'].apply(clean_en)
+    df_data['ar'] = df_data['ar'].apply(clean_ar)
+    df_data['en_length'] = df_data['en'].apply(lambda x: len(x.split(' ')))
+    df_data['ar_length'] = df_data['ar'].apply(lambda x: len(x.split(' ')))
     if os.path.exists(str(plots_out_dir)):
         pre_plot(plots_out_dir, df_data)
 
@@ -163,9 +163,9 @@ def make_data(out_dir, data_type, maxlen, valid_test_split, seed):
     df_valid, df_test = train_test_split(df_test, test_size=0.5, shuffle=True, random_state=seed)
     print(df_train.shape, df_test.shape, df_valid.shape, sep=', ')
 
-    df_train.to_csv(os.path.join(data_out_dir,'df_train.csv'), index=False)
-    df_valid.to_csv(os.path.join(data_out_dir,'df_valid.csv'), index=False)
-    df_test.to_csv(os.path.join(data_out_dir,'df_test.csv'), index=False)
+    df_train.to_csv(os.path.join(data_out_dir,'ar-en_train.csv'), index=False)
+    df_valid.to_csv(os.path.join(data_out_dir,'ar-en_valid.csv'), index=False)
+    df_test.to_csv(os.path.join(data_out_dir,'ar-en_test.csv'), index=False)
 
     return df_train, df_valid, df_test
 
