@@ -105,7 +105,7 @@ class Trainer():
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
                     train_losses.append(loss.item())
                     steps.append(step)
-                    val_loss, valid_metric = self.evaluate(compute_metric_fn=self.compute_metrics_func)
+                    val_loss, valid_metric = self.evaluate()
                     valid_losses.append(val_loss)
                     print(f'Validation step-{step}: Loss {val_loss:.4f}, Bleu Score {valid_metric:.4f}%')
                     self.model = self.model.train()
