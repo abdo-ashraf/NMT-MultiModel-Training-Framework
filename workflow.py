@@ -9,7 +9,7 @@ import argparse
 import sys
 import torch
 
-from utils import MT_Dataset, MYCollate, compute_bleu, get_parameters_info
+from utils import MT_Dataset, MyCollate, compute_bleu, get_parameters_info
 # import onnx
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
@@ -22,8 +22,7 @@ def parse_arguments():
 
     parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for train')
     parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for validation')
-    parser.add_argument('--src_tokenizer_path', type=str, required=True, help='Path of source tokenizer model')
-    parser.add_argument('--trg_tokenizer_path', type=str, required=True, help='Path of target tokenizer model')
+    parser.add_argument('--tokenizer_path', type=str, required=True, help='A path of tokenizer.model')
     parser.add_argument('--model_config_path', type=str, required=True, help='A path for model configuration file')
     parser.add_argument('--training_config_path', type=str, required=True, help='A path for training configuration file')
     
@@ -40,38 +39,34 @@ if __name__ == '__main__':
 
     assert os.path.exists(args.train_csv_path), f"{args.train_csv_path} : Train csv not found."
     assert os.path.exists(args.valid_csv_path), f"{args.valid_csv_path} : Valid csv not found."
-    assert os.path.exists(args.src_tokenizer_path), f"{args.src_tokenizer_path} : Tokenizer.model not found."
-    assert os.path.exists(args.trg_tokenizer_path), f"{args.trg_tokenizer_path} : Tokenizer.model not found."
+    assert os.path.exists(args.tokenizer_path), f"{args.tokenizer_path} : Tokenizer.model not found."
     assert os.path.exists(args.model_config_path), f"{args.model_config_path} : Model configuration file not found."
     assert os.path.exists(args.training_config_path), f"{args.training_config_path} : Training configuration file not found."
     
 
-    print("---------------------Starting Tokenizers Loading...---------------------")
-    src_tokenizer = Callable_tokenizer(args.src_tokenizer_path)
-    trg_tokenizer = Callable_tokenizer(args.trg_tokenizer_path)
-    src_vocab_size = len(src_tokenizer)
-    trg_vocab_size = len(trg_tokenizer)
-    print(f"Source tokenizer length {src_vocab_size}, Target tokenizer length {trg_vocab_size}")
-    print("Tokenizers Loading Done.")
+    print("---------------------Starting Tokenizer Loading...---------------------")
+    tokenizer = Callable_tokenizer(args.tokenizer_path)
+    vocab_size = len(tokenizer)
+    print(f"Tokenizer length {vocab_size}")
+    print("Tokenizer Loading Done.")
 
     print("---------------------Starting Data Loading...---------------------")
     train_df = pd.read_csv(args.train_csv_path)
     valid_df = pd.read_csv(args.valid_csv_path)
 
-    train_ds = MT_Dataset(src_sentences_list=train_df['source_lang'].to_list(),
-                          trg_sentences_list=train_df['target_lang'].to_list(),
-                          src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
+    train_ds = MT_Dataset(input_sentences_list=train_df['source_lang'].to_list(),
+                          target_sentences_list=train_df['target_lang'].to_list(),
+                          callable_tokenizer=tokenizer)
     
-    valid_ds = MT_Dataset(src_sentences_list=valid_df['source_lang'].to_list(),
-                          trg_sentences_list=valid_df['target_lang'].to_list(),
-                          src_tokenizer=src_tokenizer, trg_tokenizer=trg_tokenizer)
+    valid_ds = MT_Dataset(input_sentences_list=valid_df['source_lang'].to_list(),
+                          target_sentences_list=valid_df['target_lang'].to_list(),
+                          callable_tokenizer=tokenizer)
     
-    mycollate = MYCollate(batch_first=True,
-                          src_pad_value=src_tokenizer.get_tokenId('<pad>'),
-                          trg_pad_value=trg_tokenizer.get_tokenId('<pad>'))
+    mycollate = MyCollate(batch_first=True,
+                          pad_value=Callable_tokenizer.get_tokenId('<pad>'))
     
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
-    print(f"Source tokens shape: {train_ds[3][0].shape}, Target_forward shape {train_ds[3][1].shape}, Target_loss shape {train_ds[3][2].shape}")
+    print(f"Source tokens shape: {train_ds[0][0].shape}, Target_fwd tokens shape {train_ds[0][1].shape}, Target_loss tokens shape {train_ds[0][1].shape}")
     print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")
@@ -80,11 +75,11 @@ if __name__ == '__main__':
     print("Parsing Done.")
 
     print("---------------------Loading the model...---------------------")
-    model = get_model(model_args, src_vocab_size, trg_vocab_size)
+    model = get_model(model_args, vocab_size)
     names, tr, nontr = get_parameters_info(model=model)
-    print(f"{'Module':<15}{'Trainable':>15}{'Non-Trainable':>15}")
+    print(f"{'Module':<25}{'Trainable':>15}{'Non-Trainable':>15}")
     for n, ttp, ntp in zip(names, tr, nontr):
-        print(f"{n:<15}{ttp:>15,}{ntp:>15,}")
+        print(f"{n:<25}{ttp:>15,}{ntp:>15,}")
     print("Model Loading Done.")
     
     print("---------------------Parsing Training arguments...---------------------")
