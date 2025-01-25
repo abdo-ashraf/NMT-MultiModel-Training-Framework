@@ -2,23 +2,20 @@ import os
 import torch
 from tqdm import tqdm
 from .TrainingArguments import TrainingArguments
-from utils import MT_Dataset, MYCollate, save_checkpoint, plot_loss
+from utils import MT_Dataset, MyCollate, save_checkpoint, plot_loss
 from torch.utils.data import DataLoader
 
 
 class Trainer():
     def __init__(self, args:TrainingArguments, model:torch.nn.Module,
                  train_ds:MT_Dataset, valid_ds:MT_Dataset,
-                 collator:MYCollate, src_pad_tokenId:int, trg_pad_tokenId:int,
-                 compute_metrics_func):
+                 collator:MyCollate, compute_metrics_func):
         self.args = args
         self.model = model.to(self.args.device)
         self.train_ds = train_ds
         self.valid_ds = valid_ds
         self.collator = collator
         self.compute_metrics_func = compute_metrics_func
-        self.src_pad_tokenId = src_pad_tokenId
-        self.trg_pad_tokenId = trg_pad_tokenId
 
         self.generator = torch.manual_seed(self.args.seed) if self.args.seed else None
         self.train_loader = DataLoader(self.train_ds,
@@ -74,20 +71,18 @@ class Trainer():
             data = data.to(self.args.device)
             labels_forward = labels_forward.to(self.args.device)
             labels_loss = labels_loss.to(self.args.device)
-            # Forward
+            # Forward (self, source, target_forward, pad_tokenId, target_loss=None)
             if self.args.precision == 'high':
                 with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
-                    logits, loss = self.model(data,
-                                              labels_forward,
-                                              labels_loss,
-                                              src_pad_tokenId=self.src_pad_tokenId,
-                                              trg_pad_tokenId=self.trg_pad_tokenId)
+                    logits, loss = self.model(source=data,
+                                              target_forward=labels_forward,
+                                              pad_tokenId=self.collator.pad_value,
+                                              target_loss=labels_loss)
             else:
-                logits, loss = self.model(data,
-                                          labels_forward,
-                                          labels_loss,
-                                          src_pad_tokenId=self.src_pad_tokenId,
-                                          trg_pad_tokenId=self.trg_pad_tokenId)
+                logits, loss = self.model(source=data,
+                                          target_forward=labels_forward,
+                                          pad_tokenId=self.collator.pad_value,
+                                          target_loss=labels_loss)
 
             # Backward
             optimizer.zero_grad()
