@@ -101,22 +101,23 @@ class Trainer():
             tqdm_loop.set_description(f"Step [{step}/{self.args.max_steps}]")
             tqdm_loop.set_postfix_str(f'loss = {round(loss.item(), 4)}')
 
-
-            if step % self.args.eval_steps == 0 or step == self.args.max_steps:
-                train_losses.append(loss.item())
-                steps.append(step)
-                val_loss = self.evaluate(compute_metric_fn=self.compute_metrics_func)
-                valid_losses.append(val_loss)
-                print(f'Validation: Loss {val_loss:.4f}, Bleu Score (future work)%')
+            if self.args.eval_steps != 0 and self.args.eval_steps is not None:
+                if step % self.args.eval_steps == 0 or step == self.args.max_steps:
+                    train_losses.append(loss.item())
+                    steps.append(step)
+                    val_loss = self.evaluate(compute_metric_fn=self.compute_metrics_func)
+                    valid_losses.append(val_loss)
+                    print(f'Validation: Loss {val_loss:.4f}, Bleu Score (future work)%')
                 
             # Save model at specific intervals
-            if step % self.args.save_steps == 0 or step == self.args.max_steps:
-                save_checkpoint(model=self.model,
-                                optimizer=optimizer,
-                                save_dir=self.args.save_models_dir,
-                                run_name=self.args.run_name,
-                                step=step,
-                                in_onnx=self.args.onnx)
+            if self.args.save_steps != 0 and self.args.save_steps is not None:
+                if step % self.args.save_steps == 0 or step == self.args.max_steps:
+                    save_checkpoint(model=self.model,
+                                    optimizer=optimizer,
+                                    save_dir=self.args.save_models_dir,
+                                    run_name=self.args.run_name,
+                                    step=step,
+                                    in_onnx=self.args.onnx)
 
         tqdm_loop.close()
         print("Model Training Done.")
