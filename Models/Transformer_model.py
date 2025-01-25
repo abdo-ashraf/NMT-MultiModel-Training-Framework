@@ -19,13 +19,15 @@ class NMT_Transformer(nn.Module):
         encoder_layer = nn.TransformerEncoderLayer(d_model=dim_model, nhead=8,
                                                    dim_feedforward=dim_feedforward,
                                                    dropout=dropout_probability,
-                                                   batch_first=True, norm_first=True)
+                                                   batch_first=True, norm_first=True,
+                                                   activation=nn.functional.selu)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers, enable_nested_tensor=False)
 
         decoder_layer = nn.TransformerDecoderLayer(d_model=dim_model, nhead=8,
                                                    dim_feedforward=dim_feedforward,
                                                    dropout=dropout_probability,
-                                                   batch_first=True, norm_first=True)
+                                                   batch_first=True, norm_first=True,
+                                                   activation=nn.functional.selu())
         self.transformer_decoder = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
         
         self.classifier = nn.Linear(dim_model, vocab_size)
