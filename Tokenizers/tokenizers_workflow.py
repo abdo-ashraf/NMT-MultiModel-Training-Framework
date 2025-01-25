@@ -26,9 +26,6 @@ if __name__ == '__main__':
     assert os.path.exists(args.train_csv_path), f"{args.train_csv_path} : Train csv not found."
     assert os.path.exists(args.config_path), f"{args.config_path} : Config file not found."
     
-    data = json.load(open(args.config_path, 'r'))
-    src_params, tgr_params = data['src_tokenizer'], data['trg_tokenizer']
-    
+    tokenizer_params = json.load(open(args.config_path, 'r'))
     Tokenizers.train(train_csv_path=args.train_csv_path,
-                     src_lang_tokenizer_params=src_params,
-                     trg_lang_tokenizer_params=tgr_params)
+                     tokenizer_params=tokenizer_params)

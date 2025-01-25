@@ -9,43 +9,45 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 ## Dataset
 class MT_Dataset(Dataset):
-
-    def __init__(self, src_sentences_list:list, trg_sentences_list:list, src_tokenizer:Callable_tokenizer, trg_tokenizer:Callable_tokenizer, reversed_input=False):
+    """
+    Dataset class for machine translation tasks.
+    
+    Args:
+        src_sentences_list (List[str]): List of source sentences.
+        trg_sentences_list (List[str]): List of target sentences.
+        callable_tokenizer (Callable): Tokenizer.
+        reversed_input (bool): Whether to reverse the input sequence. Default is False.
+    """
+    def __init__(self, input_sentences_list:list, target_sentences_list:list, callable_tokenizer:Callable_tokenizer, reversed_input=False):
         super(MT_Dataset, self).__init__()
 
-        assert len(src_sentences_list) == len(trg_sentences_list), (f"Lengths mismatched: input has {len(src_sentences_list)} sentences, "f"but target has {len(trg_sentences_list)} sentences.")
+        assert len(input_sentences_list) == len(target_sentences_list), (f"Lengths mismatched: input has {len(input_sentences_list)} sentences, "f"but targets has {len(target_sentences_list)} sentences.")
         
-        self.src_sentences_list = src_sentences_list
-        self.trg_sentences_list = trg_sentences_list
-        self.src_tokenizer = src_tokenizer
-        self.trg_tokenizer = trg_tokenizer
+        self.input_sentences_list = input_sentences_list
+        self.target_sentences_list = target_sentences_list
+        self.callable_tokenizer = callable_tokenizer
         self.reversed_input = reversed_input
         # self.maxlen = maxlen
 
     def __len__(self):
-        return len(self.src_sentences_list)
+        return len(self.input_sentences_list)
 
     def __getitem__(self, index):
-        input, target = self.src_sentences_list[index], self.trg_sentences_list[index]
+        input, target = self.input_sentences_list[index], self.target_sentences_list[index]
 
-        input_numrical_tokens = [self.src_tokenizer.get_tokenId('<s>')] + self.src_tokenizer(input) + [self.src_tokenizer.get_tokenId('</s>')]
-        target_numrical_tokens_forward = [self.trg_tokenizer.get_tokenId('<s>')] +  self.trg_tokenizer(target)
-        target_numrical_tokens_loss = self.trg_tokenizer(target) + [self.trg_tokenizer.get_tokenId('</s>')]
-        
-        input_tensor_tokens = torch.tensor(input_numrical_tokens)
-        target_tensor_tokens_forward = torch.tensor(target_numrical_tokens_forward)
-        target_tensor_tokens_loss = torch.tensor(target_numrical_tokens_loss)
+        input_tokens = torch.tensor(self.callable_tokenizer(input) + [self.callable_tokenizer.get_tokenId('</s>')])
+        target_tokens_forward = torch.tensor([self.callable_tokenizer.get_tokenId('<trt-sos>')] +  self.callable_tokenizer(target))
+        target_tokens_loss = torch.tensor(self.callable_tokenizer(target) + [self.callable_tokenizer.get_tokenId('</s>')])
 
         if self.reversed_input: input_tensor_tokens = input_tensor_tokens.flip(0)
 
-        return input_tensor_tokens, target_tensor_tokens_forward, target_tensor_tokens_loss
+        return input_tokens, target_tokens_forward, target_tokens_loss
  
     
 ## Collator
-class MYCollate():
-    def __init__(self, batch_first=True, src_pad_value=0, trg_pad_value=0):
-        self.src_pad_value = src_pad_value
-        self.trg_pad_value = trg_pad_value
+class MyCollate():
+    def __init__(self, pad_value, batch_first=True):
+        self.pad_value = pad_value
         self.batch_first = batch_first
 
     def __call__(self, data):
@@ -54,11 +56,11 @@ class MYCollate():
         trg_stentences_loss = [ex[2] for ex in data]
 
         padded_src_stentences = pad_sequence(src_stentences, batch_first=self.batch_first,
-                                                      padding_value=self.src_pad_value)
+                                                      padding_value=self.pad_value)
         padded_trg_stentences_forward = pad_sequence(trg_stentences_forward, batch_first=self.batch_first,
-                                                      padding_value=self.trg_pad_value)
+                                                      padding_value=self.pad_value)
         padded_trg_stentences_loss = pad_sequence(trg_stentences_loss, batch_first=self.batch_first,
-                                                      padding_value=self.trg_pad_value)
+                                                      padding_value=self.pad_value)
         return padded_src_stentences, padded_trg_stentences_forward, padded_trg_stentences_loss
     
 

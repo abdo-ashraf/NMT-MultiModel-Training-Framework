@@ -4,21 +4,16 @@ import pandas as pd
 # !pip -q install sentencepiece
 ## source is english and traget is arabic.
 
-def train(train_csv_path:str, src_lang_tokenizer_params:dict, trg_lang_tokenizer_params:dict):
-  print("Starting Tokenizers Train...")
+def train(train_csv_path:str, tokenizer_params:dict):
+  print("Starting Tokenizer Train...")
   
   df_train = pd.read_csv(train_csv_path)
-  src_sentences, trg_sentences = df_train['source_lang'], df_train['target_lang']
+  src_sentences, trg_sentences = df_train['source_lang'].to_list(), df_train['target_lang'].to_list()
 
   spm.SentencePieceTrainer.train(
-      sentence_iterator=iter(src_sentences), **src_lang_tokenizer_params)
-  print(f"{src_lang_tokenizer_params['model_prefix']} Done")
-
-  spm.SentencePieceTrainer.train(
-      sentence_iterator=iter(trg_sentences), **trg_lang_tokenizer_params)
-  print(f"{trg_lang_tokenizer_params['model_prefix']} Done")
-
-  print("Tokenizers Train Done.")
+      sentence_iterator=iter(src_sentences + trg_sentences), **tokenizer_params)
+  print(f"{tokenizer_params['model_prefix']} Done")
+  print("Tokenizer Train Done.")
 
 
 ## Tokenizer
@@ -43,4 +38,4 @@ class Callable_tokenizer():
         return len(self.tokenizer)
 
     def user_tokenization(self, text):
-        return [self.get_tokenId('<s>')] + self(text) + [self.get_tokenId('</s>')]
+        return self(text) + [self.get_tokenId('</s>')]
