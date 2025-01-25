@@ -18,9 +18,8 @@
     "add_dummy_prefix": true,
     "allow_whitespace_only_pieces": true,
     "unk_id": 1,
-    "bos_id": -1,
+    "bos_id": 2,
     "eos_id": 3,
     "pad_id": 0,
-    "num_threads": 8,
-    "user_defined_symbols": "<trt-sos>"
+    "num_threads": 8
 }

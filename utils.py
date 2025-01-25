@@ -35,8 +35,8 @@ class MT_Dataset(Dataset):
     def __getitem__(self, index):
         input, target = self.input_sentences_list[index], self.target_sentences_list[index]
 
-        input_tokens = torch.tensor(self.callable_tokenizer(input) + [self.callable_tokenizer.get_tokenId('</s>')])
-        target_tokens_forward = torch.tensor([self.callable_tokenizer.get_tokenId('<trt-sos>')] +  self.callable_tokenizer(target))
+        input_tokens = torch.tensor(self.callable_tokenizer(input))
+        target_tokens_forward = torch.tensor([self.callable_tokenizer.get_tokenId('<s>')] +  self.callable_tokenizer(target))
         target_tokens_loss = torch.tensor(self.callable_tokenizer(target) + [self.callable_tokenizer.get_tokenId('</s>')])
 
         if self.reversed_input: input_tensor_tokens = input_tensor_tokens.flip(0)
