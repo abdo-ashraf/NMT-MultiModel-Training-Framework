@@ -4,16 +4,19 @@ import pandas as pd
 # !pip -q install sentencepiece
 ## source is english and traget is arabic.
 
-def train(train_csv_path:str, tokenizer_params:dict):
+def train(train_csv_path:str, tokenizer_params:dict, train_on_columns:list):
   print("Starting Tokenizer Train...")
   
-  df_train = pd.read_csv(train_csv_path)
-  src_sentences, trg_sentences = df_train['source_lang'].to_list(), df_train['target_lang'].to_list()
-
-  spm.SentencePieceTrainer.train(
-      sentence_iterator=iter(src_sentences + trg_sentences), **tokenizer_params)
+  dataframe = pd.read_csv(train_csv_path)[train_on_columns]
+  sentences = []
+  for col in train_on_columns:
+      sentences = sentences + dataframe[col].to_list()
+  spm.SentencePieceTrainer.train(sentence_iterator=iter(sentences), **tokenizer_params)
+  
   print(f"{tokenizer_params['model_prefix']} Done")
+  statics_dict = {col: len(dataframe[col]) for col in train_on_columns}
   print("Tokenizer Train Done.")
+  print(f"Trained on {statics_dict} sentences")
 
 
 ## Tokenizer
