@@ -1,6 +1,6 @@
 Future Work for the Project
     1. Enhance Evaluation Metrics:
-        - Integrate BLEU score evaluation for a better assessment of translation quality.
+        - (Done) Integrate BLEU score evaluation for a better assessment of translation quality.
         - Include other relevant metrics like ROUGE or METEOR for comprehensive evaluation.
 
     2. Improve Model Compilation:
@@ -17,6 +17,7 @@ Future Work for the Project
 
     6. Experiment Tracking:
         - Integrate MLflow for experimental tracking, providing better insights into training, validation, and hyperparameter tuning.
+	    - Use dagshub as tracking URI
 
     7. Test Set Evaluation:
         - Add functionality for evaluation of the model on a test set to ensure performance consistency.
@@ -25,7 +26,7 @@ Future Work for the Project
         - Implement beam search decoding during inference for improved translation quality.
 
     9. Mixed Precision Training:
-        - Incorporate mixed precision training to reduce memory usage and speed up computation. (Done)
+        - (Done) Incorporate mixed precision training to reduce memory usage and speed up computation.
 
     10. Hyperparameter Optimization:
         - hyperparameter tuning to find the best configuration.
