@@ -61,8 +61,8 @@ class Trainer():
         train_loader_iter = iter(self.train_loader)  # Create an iterator for the train_loader
 
         tqdm_loop = tqdm(total=self.args.max_steps, position=0)
+        self.model = self.model.train()  # Set the model to training mode
         while step < self.args.max_steps:
-            self.model.train()  # Set the model to training mode
             try:
                 # Get the next batch
                 data, labels_forward, labels_loss = next(train_loader_iter)
@@ -108,6 +108,7 @@ class Trainer():
                     val_loss = self.evaluate(compute_metric_fn=self.compute_metrics_func)
                     valid_losses.append(val_loss)
                     print(f'Validation: Loss {val_loss:.4f}, Bleu Score (future work)%')
+                    self.model = self.model.train()
                 
             # Save model at specific intervals
             if self.args.save_steps != 0 and self.args.save_steps is not None:
@@ -129,7 +130,7 @@ class Trainer():
 
     @torch.no_grad()
     def evaluate(self, compute_metric_fn):
-        self.model.eval()
+        self.model = self.model.eval()
 
         total_loss = 0
         

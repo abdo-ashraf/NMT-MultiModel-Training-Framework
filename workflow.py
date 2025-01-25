@@ -73,7 +73,6 @@ if __name__ == '__main__':
     print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
     print(f"Source tokens shape: {train_ds[3][0].shape}, Target_forward shape {train_ds[3][1].shape}, Target_loss shape {train_ds[3][2].shape}")
     print("Data Loading Done.")
-    print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")
     model_args = ModelArgs(config_path=args.model_config_path)
