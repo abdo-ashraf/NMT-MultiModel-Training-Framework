@@ -73,22 +73,26 @@ class Decoder(nn.Module):
         return output, hidden_t, alphas.squeeze(1) ## "a" is returned for visualization
 
 class Seq2seq_with_attention(nn.Module):
-    def __init__(self, encoder_vocab_size:int, decoder_vocab_size:int, dim_embed:int, dim_model:int, dim_feedforward:int, num_layers:int, dropout_probability:float):
+    def __init__(self, vocab_size:int, dim_embed:int, dim_model:int, dim_feedforward:int, num_layers:int, dropout_probability:float):
         super().__init__()
 
-        self.decoder_vocab_size = decoder_vocab_size
+        self.vocab_size = vocab_size
         self.num_layers = num_layers
-        self.encoder = Encoder(encoder_vocab_size, dim_embed, dim_model, dim_feedforward, num_layers, dropout_probability)
+        self.encoder = Encoder(vocab_size, dim_embed, dim_model, dim_feedforward, num_layers, dropout_probability)
         self.attention = Attention(dim_model)
-        self.decoder = Decoder(decoder_vocab_size, dim_embed, dim_model, self.attention, num_layers, dropout_probability)
-        self.classifier = nn.Linear(dim_model, decoder_vocab_size)
+        self.decoder = Decoder(vocab_size, dim_embed, dim_model, self.attention, num_layers, dropout_probability)
+        self.classifier = nn.Linear(dim_model, vocab_size)
 
-    def forward(self, source, target_forward, target_loss=None, src_pad_tokenId=None, trg_pad_tokenId=None):
+        ## weight sharing between classifier and embed_shared_src_trg_cls
+        self.encoder.embd_layer.weight = self.classifier.weight
+        self.decoder.embd_layer.weight = self.classifier.weight
+
+    def forward(self, source, target_forward, pad_tokenId, target_loss=None):
         # target_forward = traget but without eos token (end of sentence) and will be used in model forward path
         # target_loss = traget but without sos token (start of sentence) will be used in loss calculations as the True label
         teacher_force_ratio = 0.5
         B, T = target_forward.size()
-        total_outputs = torch.zeros(B, T, self.decoder_vocab_size, device=source.device)
+        total_outputs = torch.zeros(B, T, self.vocab_size, device=source.device)
         context, hidden = self.encoder(source)
         hidden = hidden.unsqueeze(0).repeat(self.num_layers,1,1) # (numlayer, B, dim_model)
         step_token = target_forward[:, [0]]
@@ -103,8 +107,8 @@ class Seq2seq_with_attention(nn.Module):
         return total_outputs, loss
     
     @torch.no_grad
-    def translate(self, source:torch.Tensor, trg_sos_tokenId: int, trg_eos_tokenId:int, max_tries=100):
-        targets_hat = [trg_sos_tokenId]
+    def translate(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId=0, max_tries=50):
+        targets_hat = [sos_tokenId]
         context, hidden = self.encoder(source.unsqueeze(0))
         hidden = hidden.unsqueeze(0).repeat(self.num_layers,1,1) # (numlayer, B, dim_model)
         for step in range(1, max_tries):
@@ -113,6 +117,6 @@ class Seq2seq_with_attention(nn.Module):
             logits = self.classifier(out)
             top1 = logits.argmax(-1)
             targets_hat.append(top1.item())
-            if top1 == trg_eos_tokenId:
+            if top1 == eos_tokenId:
                 return targets_hat
         return targets_hat
