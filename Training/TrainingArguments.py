@@ -73,6 +73,9 @@ class TrainingArguments:
         self.torch_compile = config.get("torch_compile")
         assert isinstance(self.torch_compile, bool), "torch_compile must be a boolean."
 
+        self.lr_decay_ratio = config.get("lr_decay_ratio")
+        assert isinstance(self.lr_decay_ratio, float), "lr_decay_ratio must be a float."
+
 
     def __repr__(self):
         """
@@ -99,4 +102,5 @@ class TrainingArguments:
                 f"  save_steps={self.save_steps},\n" +
                 f"  eval_steps={self.eval_steps},\n" +
                 f"  torch_compile={self.torch_compile}\n" +
+                f"  lr_decay_ratio={self.lr_decay_ratio}\n" +
                 ")")

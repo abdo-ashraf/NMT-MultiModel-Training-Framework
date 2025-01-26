@@ -2,7 +2,7 @@ import os
 import torch
 from tqdm import tqdm
 from .TrainingArguments import TrainingArguments
-from utils import MT_Dataset, MyCollate, save_checkpoint, plot_loss
+from utils import MT_Dataset, MyCollate, save_checkpoint, plot_loss, CosineScheduler
 from torch.utils.data import DataLoader
 
 
@@ -33,6 +33,11 @@ class Trainer():
                                   num_workers=self.args.cpu_num_workers,
                                   generator=self.generator,
                                   pin_memory=self.args.pin_memory)
+        
+        self.lr_sch = CosineScheduler(max_steps=args.max_steps,
+                                 warmup_steps=args.warmup_steps,
+                                 max_lr=args.learning_rate,
+                                 min_lr=args.learning_rate*args.lr_decay_ratio)
 
     def train(self):
 
@@ -88,6 +93,10 @@ class Trainer():
             optimizer.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
+
+            curr_lr = self.lr_sch.get_lr(step=step)
+            for group in optimizer.param_groups:
+                group['lr'] = curr_lr
             optimizer.step()
 
             # Update step
@@ -128,7 +137,6 @@ class Trainer():
         self.model = self.model.eval()
 
         total_loss = 0
-        
         for data, labels_forward, labels_loss in self.valid_loader:
             data = data.to(self.args.device)
             labels_forward = labels_forward.to(self.args.device)

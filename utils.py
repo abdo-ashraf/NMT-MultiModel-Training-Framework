@@ -1,3 +1,4 @@
+import math
 import torch
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
@@ -119,3 +120,23 @@ def compute_bleu(references:torch.Tensor, candidates:torch.Tensor):
         total_bleu += bleu_score
     
     return  total_bleu / batch_size
+
+
+class CosineScheduler():
+    def __init__(self, max_steps:int, warmup_steps:int, max_lr:float, min_lr:float):
+        self.max_steps = max_steps
+        self.warmup_steps = warmup_steps
+        self.max_lr = max_lr
+        self.min_lr = min_lr
+
+    def get_lr(self, step):
+        if step < self.warmup_steps:
+            ## linear warmup
+            return self.max_lr*(step+1) / self.warmup_steps
+        if step > self.max_steps:
+            return self.min_lr
+        else:
+            decay_ratio = (step - self.warmup_steps) / (self.max_steps - self.warmup_steps)
+            assert 0 <= decay_ratio <= 1
+            coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff starts at 1 and goes to 0
+            return self.min_lr + coeff * (self.max_lr - self.min_lr)

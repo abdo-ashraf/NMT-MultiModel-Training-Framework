@@ -15,5 +15,6 @@
     "warmup_steps": 100,
     "save_steps": 100,
     "torch_compile": false,
-    "eval_steps": 100
+    "eval_steps": 100,
+    "lr_decay_ratio": 0.1
 }
