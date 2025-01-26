@@ -7,10 +7,11 @@ Future Work for the Project
         - Resolve issues with torch.compile when enabled to leverage PyTorch's optimized compilation pipeline.
 
     3. Scheduler Enhancements:
-        - Implement warmup and cosine learning rate scheduler for better convergence and stability during training.
+        - (Done) Implement warmup and cosine learning rate scheduler for better convergence and stability during training.
     
     4. Optimize Transformer Models:
         - Add support for Flash Attention to enhance efficiency and speed in transformer-based models.
+        - Add pretrained models like Marain-MT for AraBert
     
     5. ONNX Model Support:
         - Enable saving models in ONNX format when in_onnx is set to True for deployment in various platforms.
