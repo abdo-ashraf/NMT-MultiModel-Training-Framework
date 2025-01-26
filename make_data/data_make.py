@@ -34,19 +34,18 @@ def unicodeToAscii(s):
 
 def clean_ar(text):
     text = unicodeToAscii(text) # Remove diacritics "التشكيل"
-    text = text.replace("ة", "ه")
     text = text.replace(",", "،")
     text = text.replace(".", "۔")
     text = text.replace("?", "؟")
     text = re.sub(r"[;:]", "؛", text)
-    text = re.sub(r"[^؀-ۿ0-9.!¿]+", " ", text)
+    text = re.sub(r"[^؀-ۿ0-9.!؟،؛:\-()\"' ]+", " ", text)
     text = re.sub(r'\s+', ' ', text).strip() # Trim multiple whitespaces to one
     return text
 
 def clean_en(text):
     text = text.lower()
     text = contractions.fix(text) # Fix contractions "it's" -> "it is"
-    text = re.sub(r"[^a-z0-9?.!,¿:;'\"]+", " ", text)
+    text = re.sub(r"[^a-z0-9?.!,¿:;'\"\-() ]+", " ", text)
     text = re.sub(r'\s+', ' ', text).strip() # Trim multiple whitespaces to one
     return text
 

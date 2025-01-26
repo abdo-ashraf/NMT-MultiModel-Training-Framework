@@ -102,7 +102,7 @@ class Trainer():
                     steps.append(step)
                     val_loss, valid_metric = self.evaluate()
                     valid_losses.append(val_loss)
-                    print(f'Validation step-{step}: Loss {val_loss:.4f}, Bleu Score {valid_metric:.4f}%')
+                    print(f'Validation step-{step}: Loss {val_loss:.4f}, Bleu Score {valid_metric*100:.2f}%')
                     self.model = self.model.train()
                 
             # Save model at specific intervals

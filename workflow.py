@@ -65,7 +65,7 @@ if __name__ == '__main__':
     mycollate = MyCollate(batch_first=True,
                             pad_value=tokenizer.get_tokenId('<pad>'))
 
-    print(f"Training data length {len(train_ds)}, Validation data length {len(valid_ds)}")
+    print(f"Training data length {len(train_ds):,}, Validation data length {len(valid_ds):,}")
     print(f"Source tokens shape: {train_ds[0][0].shape}, Target_fwd tokens shape {train_ds[0][1].shape}, Target_loss tokens shape {train_ds[0][2].shape}")
     print("Data Loading Done.")
 
