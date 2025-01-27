@@ -49,7 +49,7 @@ class NMT_Transformer(nn.Module):
     def forward(self, source, target_forward, pad_tokenId, target_loss=None):
         # target_forward = <sos> + text
         # target_loss = text + <eos>
-        # source = text + <eos>
+        # source = text
         B, Ts = source.shape
         B, Tt = target_forward.shape
         device = source.device
@@ -77,7 +77,7 @@ class NMT_Transformer(nn.Module):
         return logits, loss
     
     @torch.no_grad
-    def translate(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId=0, max_tries=50):
+    def translate(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId, max_tries=50):
         """
         Translates a source sequence into a target sequence using greedy decoding.
         """
