@@ -150,7 +150,7 @@ class Trainer():
                                                            pad_tokenId=self.collator.pad_value)
 
             candidates = torch.argmax(class_logits, dim=-1)
-            total_metric = self.compute_metrics_func(labels_forward[:,1:], candidates[:,1:,:])
+            total_metric = self.compute_metrics_func(labels_forward[:,1:], candidates[:,1:])
             total_loss += item_total_loss.item()
 
         avg_loss = total_loss / len(self.valid_loader)
