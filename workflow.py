@@ -9,7 +9,7 @@ import argparse
 import sys
 import torch
 
-from utils import MT_Dataset, MyCollate, compute_bleu, get_parameters_info
+from utils import MT_Dataset, MyCollate, compute_metrics, get_parameters_info
 # import onnx
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     print("---------------------Start training...---------------------")
     trainer = Trainer(args=training_args, model=model,
                         train_ds=train_ds, valid_ds=valid_ds,
-                        collator=mycollate, compute_metrics_func=compute_bleu)
+                        collator=mycollate, compute_metrics_func=compute_metrics)
 
     train_losses, valid_losses = trainer.train()
     print("Training Done.")

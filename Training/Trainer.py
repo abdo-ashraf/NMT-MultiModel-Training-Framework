@@ -4,6 +4,7 @@ from tqdm import tqdm
 from .TrainingArguments import TrainingArguments
 from utils import MT_Dataset, MyCollate, save_checkpoint, plot_loss, CosineScheduler
 from torch.utils.data import DataLoader
+from collections import defaultdict
 
 
 class Trainer():
@@ -56,7 +57,7 @@ class Trainer():
             print("Using TF16")
 
         train_losses = []
-        valid_losses = []
+        valid_metrics = []
         valid_metric = []
         steps = []
         step=0
@@ -107,9 +108,9 @@ class Trainer():
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
                     train_losses.append(loss.item())
                     steps.append(step)
-                    val_loss, valid_metric = self.evaluate()
-                    valid_losses.append(val_loss)
-                    print(f'Validation step-{step}: Loss {val_loss:.4f}, Bleu Score {valid_metric*100:.2f}%')
+                    metrics = self.evaluate()
+                    valid_metrics.append(metrics)
+                    print(f'Validation step-{step}: {metrics}')
                     self.model = self.model.train()
                 
             # Save model at specific intervals
@@ -125,16 +126,15 @@ class Trainer():
         tqdm_loop.close()
         print("Model Training Done.")
 
-        plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)
+        # plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)
 
-        return train_losses, valid_losses
+        return train_losses, valid_metrics
     
 
     @torch.no_grad()
     def evaluate(self):
         self.model = self.model.eval()
-
-        total_loss = 0
+        results_dict = defaultdict(list)
         for data, labels_forward in self.valid_loader:
             data = data.to(self.args.device)
             labels_forward = labels_forward.to(self.args.device)
@@ -150,9 +150,10 @@ class Trainer():
                                                            pad_tokenId=self.collator.pad_value)
 
             candidates = torch.argmax(class_logits, dim=-1)
-            total_metric = self.compute_metrics_func(labels_forward[:,1:], candidates[:,1:])
-            total_loss += item_total_loss.item()
+            metrics_dict = self.compute_metrics_func(labels_forward[:,1:], candidates[:,1:])
+            metrics_dict["Loss"] = item_total_loss.item()
 
-        avg_loss = total_loss / len(self.valid_loader)
-        avg_metric = total_metric / len(self.valid_loader)
-        return avg_loss, avg_metric
+            for metric in metrics_dict.keys():
+                results_dict[metric].append(metrics_dict[metric])
+
+        return {name: sum(values_list)/len(values_list) for name, values_list in results_dict.items()}

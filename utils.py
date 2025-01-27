@@ -6,6 +6,7 @@ from Tokenizers.Tokenizers import Callable_tokenizer
 import matplotlib.pyplot as plt
 import os
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from sklearn.metrics import accuracy_score
 
 
 ## Dataset
@@ -109,7 +110,7 @@ def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str
     print(f"Checkpoint saved at: {model_path}")
 
 
-def compute_bleu(references:torch.Tensor, candidates:torch.Tensor):
+def compute_metrics(references:torch.Tensor, candidates:torch.Tensor):
     batch_size = candidates.size(0)
     total_bleu = 0
     smoothing = SmoothingFunction().method2  # Use smoothing to handle zero n-gram overlaps
@@ -120,8 +121,10 @@ def compute_bleu(references:torch.Tensor, candidates:torch.Tensor):
         bleu_score = sentence_bleu(references_one, candidate, weights=[0.33,0.33,0.33,0.0], smoothing_function=smoothing)
         # print(round(bleu_score, 4))
         total_bleu += bleu_score
+    bleu = total_bleu / batch_size
+    accuracy = accuracy_score(references.reshape(-1), candidates.reshape(-1))
     
-    return  total_bleu / batch_size
+    return  {"Accuracy": accuracy, "Bleu": bleu}
 
 
 class CosineScheduler():
