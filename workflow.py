@@ -69,8 +69,8 @@ if __name__ == '__main__':
 
     print(f"Training data length {len(train_ds):,}, Validation data length {len(valid_ds):,}")
     print(f"Source tokens: {train_ds[0][0]}")
-    print(f"Target_fwd tokens: {train_ds[0][1]}")
-    print(f"Target_loss tokens: {train_ds[0][2]}")
+    print(f"Target tokens: {train_ds[0][1]}")
+    # print(f"Target_loss tokens: {train_ds[0][2]}")
     print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")

@@ -87,32 +87,33 @@ class Seq2seq_with_attention(nn.Module):
         self.encoder.embd_layer.weight = self.classifier.weight
         self.decoder.embd_layer.weight = self.classifier.weight
 
-    def forward(self, source, target_forward, pad_tokenId, target_loss=None):
-        # target_forward = traget but without eos token (end of sentence) and will be used in model forward path
-        # target_loss = traget but without sos token (start of sentence) will be used in loss calculations as the True label
+    def forward(self, source, target, pad_tokenId):
+        # target = <s> text </s>
         teacher_force_ratio = 0.5
-        B, T = target_forward.size()
-        total_outputs = torch.zeros(B, T, self.vocab_size, device=source.device)
+        B, T = target.size()
+        total_logits = torch.zeros(B, T, self.vocab_size, device=source.device)
         context, hidden = self.encoder(source)
         hidden = hidden.unsqueeze(0).repeat(self.num_layers,1,1) # (numlayer, B, dim_model)
-        step_token = target_forward[:, [0]]
+        step_token = target[:, [0]]
         for step in range(1, T):
             out, hidden, alphas = self.decoder(step_token, context, hidden)
             logits = self.classifier(out).squeeze(1)
-            total_outputs[:, step] = logits
+            total_logits[:, step] = logits
             top1 = logits.argmax(-1, keepdim=True)
-            step_token = target_forward[:, [step]] if teacher_force_ratio > random.random() else top1
+            step_token = target[:, [step]] if teacher_force_ratio > random.random() else top1
 
-        loss = nn.functional.cross_entropy(total_outputs.view(-1, total_outputs.size(-1)), target_loss.view(-1), ignore_index=pad_tokenId) if target_loss is not None else None
-        return total_outputs, loss
+        flat_logits = total_logits[:,1:,:].reshape(-1, total_logits.size(-1))
+        flat_targets = target[:,1:].reshape(-1)
+        loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId) if target is not None else None
+        return total_logits, loss
     
     @torch.no_grad
-    def translate(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId=0, max_tries=50):
+    def translate(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId, max_tries=50):
         targets_hat = [sos_tokenId]
         context, hidden = self.encoder(source.unsqueeze(0))
         hidden = hidden.unsqueeze(0).repeat(self.num_layers,1,1) # (numlayer, B, dim_model)
-        for step in range(1, max_tries):
-            x = torch.tensor([targets_hat[-1]]).unsqueeze(0).to(source.device)
+        for step in range(0, max_tries):
+            x = torch.tensor([targets_hat[step]]).unsqueeze(0).to(source.device)
             out, hidden, alphas = self.decoder(x, context, hidden)
             logits = self.classifier(out)
             top1 = logits.argmax(-1)

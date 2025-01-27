@@ -29,6 +29,8 @@ class MT_Dataset(Dataset):
         self.callable_tokenizer = callable_tokenizer
         self.reversed_input = reversed_input
         # self.maxlen = maxlen
+        self.sos = self.callable_tokenizer.get_tokenId('<s>')
+        self.eos = self.callable_tokenizer.get_tokenId('</s>')
 
     def __len__(self):
         return len(self.input_sentences_list)
@@ -37,12 +39,12 @@ class MT_Dataset(Dataset):
         input, target = self.input_sentences_list[index], self.target_sentences_list[index]
 
         input_tokens = torch.tensor(self.callable_tokenizer(input))
-        target_tokens_forward = torch.tensor([self.callable_tokenizer.get_tokenId('<s>')] +  self.callable_tokenizer(target))
-        target_tokens_loss = torch.tensor(self.callable_tokenizer(target) + [self.callable_tokenizer.get_tokenId('</s>')])
+        target_tokens_forward = torch.tensor([self.sos] + self.callable_tokenizer(target) + [self.eos])
+        # target_tokens_loss = torch.tensor(self.callable_tokenizer(target) + [self.eos])
 
         if self.reversed_input: input_tensor_tokens = input_tensor_tokens.flip(0)
 
-        return input_tokens, target_tokens_forward, target_tokens_loss
+        return input_tokens, target_tokens_forward#, target_tokens_loss
  
     
 ## Collator
@@ -54,15 +56,15 @@ class MyCollate():
     def __call__(self, data):
         src_stentences = [ex[0] for ex in data]
         trg_stentences_forward = [ex[1] for ex in data]
-        trg_stentences_loss = [ex[2] for ex in data]
+        # trg_stentences_loss = [ex[2] for ex in data]
 
         padded_src_stentences = pad_sequence(src_stentences, batch_first=self.batch_first,
                                                       padding_value=self.pad_value)
         padded_trg_stentences_forward = pad_sequence(trg_stentences_forward, batch_first=self.batch_first,
                                                       padding_value=self.pad_value)
-        padded_trg_stentences_loss = pad_sequence(trg_stentences_loss, batch_first=self.batch_first,
-                                                      padding_value=self.pad_value)
-        return padded_src_stentences, padded_trg_stentences_forward, padded_trg_stentences_loss
+        # padded_trg_stentences_loss = pad_sequence(trg_stentences_loss, batch_first=self.batch_first,
+        #                                               padding_value=self.pad_value)
+        return padded_src_stentences, padded_trg_stentences_forward#, padded_trg_stentences_loss
     
 
 def get_parameters_info(model):

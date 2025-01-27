@@ -67,27 +67,25 @@ class Trainer():
         while step < self.args.max_steps:
             try:
                 # Get the next batch
-                data, labels_forward, labels_loss = next(train_loader_iter)
+                data, labels_forward = next(train_loader_iter)
             except StopIteration:
                 # Reinitialize the iterator when all batches are consumed
                 train_loader_iter = iter(self.train_loader)
-                data, labels_forward, labels_loss = next(train_loader_iter)
+                data, labels_forward = next(train_loader_iter)
             # Get data
             data = data.to(self.args.device)
             labels_forward = labels_forward.to(self.args.device)
-            labels_loss = labels_loss.to(self.args.device)
-            # Forward (self, source, target_forward, pad_tokenId, target_loss=None)
+            
+            # Forward
             if self.args.precision == 'high':
                 with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
                     logits, loss = self.model(source=data,
-                                              target_forward=labels_forward,
-                                              pad_tokenId=self.collator.pad_value,
-                                              target_loss=labels_loss)
+                                              target=labels_forward,
+                                              pad_tokenId=self.collator.pad_value)
             else:
                 logits, loss = self.model(source=data,
-                                          target_forward=labels_forward,
-                                          pad_tokenId=self.collator.pad_value,
-                                          target_loss=labels_loss)
+                                          target=labels_forward,
+                                          pad_tokenId=self.collator.pad_value)
 
             # Backward
             optimizer.zero_grad()
@@ -137,25 +135,22 @@ class Trainer():
         self.model = self.model.eval()
 
         total_loss = 0
-        for data, labels_forward, labels_loss in self.valid_loader:
+        for data, labels_forward in self.valid_loader:
             data = data.to(self.args.device)
             labels_forward = labels_forward.to(self.args.device)
-            labels_loss = labels_loss.to(self.args.device)
 
             if self.args.precision == 'high':
                 with torch.autocast(device_type=self.args.device, dtype=torch.bfloat16):
                     class_logits, item_total_loss = self.model(source=data,
-                                                               target_forward=labels_forward,
-                                                               pad_tokenId=self.collator.pad_value,
-                                                               target_loss=labels_loss)
+                                                               target=labels_forward,
+                                                               pad_tokenId=self.collator.pad_value)
             else:
                 class_logits, item_total_loss = self.model(source=data,
-                                                           target_forward=labels_forward,
-                                                           pad_tokenId=self.collator.pad_value,
-                                                           target_loss=labels_loss)
+                                                           target=labels_forward,
+                                                           pad_tokenId=self.collator.pad_value)
 
             candidates = torch.argmax(class_logits, dim=-1)
-            total_metric = self.compute_metrics_func(labels_loss, candidates)
+            total_metric = self.compute_metrics_func(labels_forward[:,1:], candidates[:,1:,:])
             total_loss += item_total_loss.item()
 
         avg_loss = total_loss / len(self.valid_loader)
