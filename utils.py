@@ -122,7 +122,7 @@ def compute_metrics(references:torch.Tensor, candidates:torch.Tensor):
         # print(round(bleu_score, 4))
         total_bleu += bleu_score
     bleu = total_bleu / batch_size
-    accuracy = accuracy_score(references.reshape(-1), candidates.reshape(-1))
+    accuracy = accuracy_score(references.cpu().reshape(-1), candidates.cpu().reshape(-1))
     
     return  {"Accuracy": accuracy, "Bleu": bleu}
 
