@@ -102,8 +102,7 @@ class Trainer():
             step += 1
             tqdm_loop.update(1)
             tqdm_loop.set_description(f"Step [{step}/{self.args.max_steps}]")
-            tqdm_loop.set_postfix_str(f'loss = {round(loss.item(), 4)}')
-            tqdm_loop.set_postfix_str(f'lr = {round(curr_lr, 6)}')
+            tqdm_loop.set_postfix_str(f'loss={round(loss.item(), 4)}, lr = {round(curr_lr, 6)}')
 
             if self.args.eval_steps != 0 and self.args.eval_steps is not None:
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
@@ -157,4 +156,10 @@ class Trainer():
             for metric in metrics_dict.keys():
                 results_dict[metric].append(metrics_dict[metric])
 
-        return {name: sum(values_list)/len(values_list) for name, values_list in results_dict.items()}
+        to_return = {}
+        for name, values_list in results_dict.items():
+            if name.lower() == "accuracy" or name.lower() == "bleu":
+                to_return[name] = round(sum(values_list)/len(values_list)*100, 2)
+            else:
+                to_return[name] = round(sum(values_list)/len(values_list), 4)
+        return to_return
