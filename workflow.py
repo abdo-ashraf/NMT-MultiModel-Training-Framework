@@ -20,8 +20,10 @@ from utils import MT_Dataset, MyCollate, compute_bleu, get_parameters_info
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Argument Parser for Your Program')
 
-    parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for train')
-    parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns "source_lang" and "target_lang" for validation')
+    parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns for train')
+    parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns for validation')
+    parser.add_argument('--source_column_name', type=str, required=True, help='source_column_name')
+    parser.add_argument('--target_column_name', type=str, required=True, help='target_column_name')
     parser.add_argument('--tokenizer_path', type=str, required=True, help='A path of tokenizer.model')
     parser.add_argument('--model_config_path', type=str, required=True, help='A path for model configuration file')
     parser.add_argument('--training_config_path', type=str, required=True, help='A path for training configuration file')
@@ -54,12 +56,12 @@ if __name__ == '__main__':
     train_df = pd.read_csv(args.train_csv_path)
     valid_df = pd.read_csv(args.valid_csv_path)
 
-    train_ds = MT_Dataset(input_sentences_list=train_df['ar'].to_list(),
-                            target_sentences_list=train_df['en'].to_list(),
+    train_ds = MT_Dataset(input_sentences_list=train_df[args.source_column_name].to_list(),
+                            target_sentences_list=train_df[args.target_column_name].to_list(),
                             callable_tokenizer=tokenizer)
 
-    valid_ds = MT_Dataset(input_sentences_list=valid_df['ar'].to_list(),
-                            target_sentences_list=valid_df['en'].to_list(),
+    valid_ds = MT_Dataset(input_sentences_list=valid_df[args.source_column_name].to_list(),
+                            target_sentences_list=valid_df[args.target_column_name].to_list(),
                             callable_tokenizer=tokenizer)
 
     mycollate = MyCollate(batch_first=True,
