@@ -75,7 +75,7 @@ class NMT_Transformer(nn.Module):
                                                 memory_key_padding_mask=None)
         ## Classifier Path
         logits = self.classifier(decoder_out)
-        loss = nn.functional.cross_entropy(logits.view(-1, logits.size(-1)), target_loss.view(-1)) if target_loss is not None else None
+        loss = nn.functional.cross_entropy(logits.view(-1, logits.size(-1)), target_loss.view(-1), ignore_index=pad_tokenId) if target_loss is not None else None
         return logits, loss
     
     @torch.no_grad

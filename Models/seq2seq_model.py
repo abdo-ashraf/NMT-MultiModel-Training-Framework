@@ -75,7 +75,7 @@ class Seq2seq_no_attention(nn.Module):
             top1 = logits.argmax(-1, keepdim=True)
             step_token = target_forward[:, [step]] if teacher_force_ratio > random.random() else top1
 
-        loss = nn.functional.cross_entropy(total_outputs.view(-1, total_outputs.size(-1)), target_loss.view(-1)) if target_loss is not None else None
+        loss = nn.functional.cross_entropy(total_outputs.view(-1, total_outputs.size(-1)), target_loss.view(-1), ignore_index=pad_tokenId) if target_loss is not None else None
         return total_outputs, loss
     
     @torch.no_grad
