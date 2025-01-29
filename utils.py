@@ -120,7 +120,7 @@ def compute_metrics(references:torch.Tensor, candidates:torch.Tensor, ignore_ind
         candidate = candidates[i][mask_i].tolist()
         references_one = [references[i][mask_i].tolist()]
         bleu_score = sentence_bleu(references_one, candidate, weights=[0.25,0.25,0.25,0.25], smoothing_function=smoothing)
-        accu_score = accuracy_score(references_one[0], candidate)
+        accu_score = sentence_bleu(references_one, candidate, weights=[1.0,0.0,0.0,0.0], smoothing_function=smoothing)
         total_bleu += bleu_score
         total_accu += accu_score
     bleu = total_bleu / batch_size
