@@ -1,7 +1,7 @@
 {
-    "model_prefix": "./out/tokenizers/ar-en_tokenizer",
+    "model_prefix": "./out/tokenizers/en-sp_tokenizer",
     "model_type": "bpe",
-    "vocab_size": 8192,
+    "vocab_size": 6000,
     "normalization_rule_name": "nmt_nfkc_cf",
     "remove_extra_whitespaces": true,
     "input_sentence_size": 200000000,
@@ -21,5 +21,5 @@
     "bos_id": 2,
     "eos_id": 3,
     "pad_id": 0,
-    "num_threads": 8
+    "num_threads": 4
 }
