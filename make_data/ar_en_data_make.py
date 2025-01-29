@@ -138,7 +138,7 @@ def post_plot(plots_dir, filtered_data):
     # Close the plot to prevent it from displaying
     plt.close(fig)
 
-def make_data(out_dir, data_type, maxlen, valid_test_split, seed):
+def ar_en_data(out_dir, data_type, maxlen, valid_test_split, seed):
 
     data_out_dir = os.path.join(out_dir, 'data')
     os.makedirs(data_out_dir, exist_ok=True)
