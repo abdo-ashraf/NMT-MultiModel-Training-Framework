@@ -46,12 +46,11 @@ class NMT_Transformer(nn.Module):
             torch.nn.init.ones_(module.weight)
             torch.nn.init.zeros_(module.bias)
     
-    def forward(self, source, target_forward, pad_tokenId, target_loss=None):
-        # target_forward = <sos> + text
-        # target_loss = text + <eos>
+    def forward(self, source, target, pad_tokenId):
+        # target = <sos> + text + <eos>
         # source = text
         B, Ts = source.shape
-        B, Tt = target_forward.shape
+        B, Tt = target.shape
         device = source.device
         ## Encoder Path
         src_poses = self.positonal_shared_src_trg(torch.arange(0, Ts).to(device).unsqueeze(0).repeat(B, 1))
@@ -61,9 +60,9 @@ class NMT_Transformer(nn.Module):
         memory = self.transformer_encoder(src=src_embedings, mask=None, src_key_padding_mask=src_pad_mask, is_causal=False)
         ## Decoder Path
         trg_poses = self.positonal_shared_src_trg(torch.arange(0, Tt).to(device).unsqueeze(0).repeat(B, 1))
-        trg_embedings = self.dropout(self.embed_shared_src_trg_cls(target_forward) + trg_poses)
+        trg_embedings = self.dropout(self.embed_shared_src_trg_cls(target) + trg_poses)
         
-        trg_pad_mask = target_forward == pad_tokenId
+        trg_pad_mask = target == pad_tokenId
         tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(Tt, dtype=bool).to(device)
         decoder_out = self.transformer_decoder.forward(tgt=trg_embedings,
                                                 memory=memory,
@@ -73,7 +72,12 @@ class NMT_Transformer(nn.Module):
                                                 memory_key_padding_mask=None)
         ## Classifier Path
         logits = self.classifier(decoder_out)
-        loss = nn.functional.cross_entropy(logits.view(-1, logits.size(-1)), target_loss.view(-1), ignore_index=pad_tokenId) if target_loss is not None else None
+
+        # for model logits we will need all tokens except the last one
+        flat_logits = logits[:,:-1,:].reshape(-1, logits.size(-1))
+        # for targets we will need all tokens excapt the first one
+        flat_targets = target[:,1:].reshape(-1)
+        loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId) if target is not None else None
         return logits, loss
     
     @torch.no_grad
@@ -88,7 +92,7 @@ class NMT_Transformer(nn.Module):
         trg_tokens = torch.tensor([sos_tokenId]).unsqueeze(0).to(device)
 
         for _ in range(max_tries):
-            logits, loss = self.forward(source=source, target_forward=trg_tokens, pad_tokenId=pad_tokenId)
+            logits, loss = self.forward(source=source, target=trg_tokens, pad_tokenId=pad_tokenId)
             next_token = logits[:,-1,:].argmax(dim=-1, keepdim=True)  # Greedy decoding
             # Append predicted token
             trg_tokens = torch.cat([trg_tokens, next_token], dim=1)
