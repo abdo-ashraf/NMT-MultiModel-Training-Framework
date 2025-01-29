@@ -132,10 +132,11 @@ class Trainer():
     
 
     @torch.no_grad()
-    def evaluate(self):
+    def evaluate(self, dataloader=None):
+        loader = self.valid_loader if dataloader is None else dataloader
         self.model = self.model.eval()
         results_dict = defaultdict(list)
-        for data, labels_forward in self.valid_loader:
+        for data, labels_forward in loader:
             data = data.to(self.args.device)
             labels_forward = labels_forward.to(self.args.device)
 
