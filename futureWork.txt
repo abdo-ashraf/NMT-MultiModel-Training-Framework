@@ -1,6 +1,7 @@
 Future Work for the Project
     1. (Done) Enhance Evaluation Metrics:
         - Integrate BLEU score evaluation for a better assessment of translation quality.
+        - Integrate Accuracy score evaluation.
 
     2. Improve Model Compilation:
         - Resolve issues with torch.compile when enabled to leverage PyTorch's optimized compilation pipeline.
