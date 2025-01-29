@@ -39,8 +39,8 @@ def sp_en_data(out_dir, valid_test_split, seed):
     df_valid = pd.DataFrame(val_pairs, columns=['en', 'sp'])
     df_test = pd.DataFrame(test_pairs, columns=['en', 'sp'])
     print(df_train.shape, df_test.shape, df_valid.shape, sep=', ')
-    df_train.to_csv(os.path.join(out_dir, 'en-sp_train.csv'))
-    df_valid.to_csv(os.path.join(out_dir, 'en-sp_valid.csv'))
-    df_test.to_csv(os.path.join(out_dir, 'en-sp_test.csv'))
+    df_train.to_csv(os.path.join(out_dir, 'en-sp_train.csv'), index=False)
+    df_valid.to_csv(os.path.join(out_dir, 'en-sp_valid.csv'), index=False)
+    df_test.to_csv(os.path.join(out_dir, 'en-sp_test.csv'), index=False)
 
     return df_train, df_valid, df_test
