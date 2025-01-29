@@ -1,5 +1,5 @@
 import argparse
-from .ar_en_data_make import ar_en_data
+from ar_en_data_make import ar_en_data
 
 #####-----Parameters-----#####
 # DEFAULT_OUT_DIR = './out/'
