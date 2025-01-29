@@ -1,6 +1,5 @@
 {
     "save_models_dir": "./out/models",
-    "save_plots_dir": "./out/plots",
     "learning_rate": 0.001,
     "max_steps": 12000,
     "seed": 123,

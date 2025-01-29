@@ -1,13 +1,12 @@
 Future Work for the Project
-    1. Enhance Evaluation Metrics:
-        - (Done) Integrate BLEU score evaluation for a better assessment of translation quality.
-        - Include other relevant metrics like ROUGE or METEOR for comprehensive evaluation.
+    1. (Done) Enhance Evaluation Metrics:
+        - Integrate BLEU score evaluation for a better assessment of translation quality.
 
     2. Improve Model Compilation:
         - Resolve issues with torch.compile when enabled to leverage PyTorch's optimized compilation pipeline.
 
-    3. Scheduler Enhancements:
-        - (Done) Implement warmup and cosine learning rate scheduler for better convergence and stability during training.
+    3. (Done) Scheduler Enhancements:
+        - Implement warmup and cosine learning rate scheduler for better convergence and stability during training.
     
     4. Optimize Transformer Models:
         - Add support for Flash Attention to enhance efficiency and speed in transformer-based models.
@@ -18,7 +17,6 @@ Future Work for the Project
 
     6. Experiment Tracking:
         - Integrate MLflow for experimental tracking, providing better insights into training, validation, and hyperparameter tuning.
-	    - Use dagshub as tracking URI
 
     7. Test Set Evaluation:
         - Add functionality for evaluation of the model on a test set to ensure performance consistency.
@@ -32,6 +30,6 @@ Future Work for the Project
     10. Hyperparameter Optimization:
         - hyperparameter tuning to find the best configuration.
 
-    11. Model Deployment:
+    11. Models Deployment:
         - Include utilities for exporting and deploying models.
 
