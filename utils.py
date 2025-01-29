@@ -110,19 +110,23 @@ def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str
     print(f"Checkpoint saved at: {model_path}")
 
 
-def compute_metrics(references:torch.Tensor, candidates:torch.Tensor):
+def compute_metrics(references:torch.Tensor, candidates:torch.Tensor, ignore_index:int):
     batch_size = candidates.size(0)
     total_bleu = 0
+    total_accu = 0
     smoothing = SmoothingFunction().method2  # Use smoothing to handle zero n-gram overlaps
     for i in range(batch_size):
-        mask_i = references[i]!=0
+        mask_i = references[i]!=ignore_index
         candidate = candidates[i][mask_i].tolist()
         references_one = [references[i][mask_i].tolist()]
         bleu_score = sentence_bleu(references_one, candidate, weights=[0.33,0.33,0.33,0.0], smoothing_function=smoothing)
-        # print(round(bleu_score, 4))
+        accu_score = accuracy_score(references_one[0], candidate)
         total_bleu += bleu_score
+        total_accu += accu_score
+        print(accu_score)
     bleu = total_bleu / batch_size
-    accuracy = accuracy_score(references.cpu().reshape(-1), candidates.cpu().reshape(-1))
+    accuracy = total_accu / batch_size
+    # accuracy = accuracy_score(references.cpu().reshape(-1), candidates.cpu().reshape(-1))
     
     return  {"Accuracy": accuracy, "Bleu": bleu}
 
