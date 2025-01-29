@@ -1,4 +1,3 @@
-import os
 import torch
 from tqdm import tqdm
 from .TrainingArguments import TrainingArguments
@@ -12,8 +11,6 @@ class Trainer():
                  train_ds:MT_Dataset, valid_ds:MT_Dataset,
                  collator:MyCollate, compute_metrics_func):
         
-        os.makedirs(args.save_models_dir, exist_ok=True)
-        os.makedirs(args.save_plots_dir, exist_ok=True)
         self.args = args
         self.model = model.to(self.args.device)
         self.train_ds = train_ds

@@ -23,6 +23,7 @@ class TrainingArguments:
 
         # Validate and assign attributes
         self.save_models_dir = config.get("save_models_dir")
+        os.makedirs(self.save_models_dir, exist_ok=True)
         assert os.path.exists(self.save_models_dir), f"{self.save_models_dir} : output directory not found."
 
         # self.save_plots_dir = config.get("save_plots_dir")
