@@ -105,7 +105,7 @@ class Trainer():
             tqdm_loop.set_postfix_str(f'loss={round(loss.item(), 4)}')
 
             if self.args.eval_steps != 0 and self.args.eval_steps is not None:
-                if step % self.args.eval_steps == 0 or step == (self.args.max_steps-1):
+                if step % self.args.eval_steps == 0 or step == self.args.max_steps:
                     train_losses.append(loss.item())
                     steps.append(step)
                     metrics = self.evaluate()
@@ -115,7 +115,7 @@ class Trainer():
                 
             # Save model at specific intervals
             if self.args.save_steps != 0 and self.args.save_steps is not None:
-                if step % self.args.save_steps == 0 or step == (self.args.max_steps-1):
+                if step % self.args.save_steps == 0 or step == self.args.max_steps:
                     save_checkpoint(model=self.model,
                                     optimizer=optimizer,
                                     save_dir=self.args.save_models_dir,
