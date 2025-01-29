@@ -1,5 +1,5 @@
 import argparse
-from make_data.sp_en_data_make import sp_en_data
+from .sp_en_data_make import sp_en_data
 
 #####-----Parameters-----#####
 # DEFAULT_OUT_DIR = './out/'
