@@ -81,6 +81,7 @@ class Seq2seq_no_attention(nn.Module):
     
     @torch.no_grad
     def greedy_decode_fast(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId, max_tries=50):
+        self.eval()
         targets_hat = [sos_tokenId]
         context = self.encoder(source.unsqueeze(0))
         context = context.unsqueeze(0).repeat(self.num_layers,1,1)
