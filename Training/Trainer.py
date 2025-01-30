@@ -151,7 +151,7 @@ class Trainer():
                                                            pad_tokenId=self.collator.pad_value)
 
             candidates = torch.argmax(class_logits, dim=-1)
-            metrics_dict = self.compute_metrics_func(labels_forward[:,1:], candidates[:,1:], self.collator.pad_value)
+            metrics_dict = self.compute_metrics_func(labels_forward[:,1:], candidates[:,:-1,:], self.collator.pad_value)
             metrics_dict["Loss"] = item_total_loss.item()
 
             for metric in metrics_dict.keys():
