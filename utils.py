@@ -148,3 +148,21 @@ class CosineScheduler():
             assert 0 <= decay_ratio <= 1
             coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff starts at 1 and goes to 0
             return self.min_lr + coeff * (self.max_lr - self.min_lr)
+        
+
+@torch.no_grad
+def greedy_decode(model:torch.nn.Module, source_tensor:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId, max_tries=50):
+    model.eval()
+    device = source_tensor.device
+    target_tensor = torch.tensor([sos_tokenId]).unsqueeze(0).to(device)
+
+    for i in range(max_tries):
+        logits, _ = model(source_tensor, target_tensor, pad_tokenId)
+        # Greedy decoding
+        top1 = logits[:,-1,:].argmax(dim=-1, keepdim=True)
+        # Append predicted token
+        target_tensor = torch.cat([target_tensor, top1], dim=1)
+        # Stop if predict <EOS>
+        if top1.item() == eos_tokenId:
+            break
+    return target_tensor.squeeze(0).tolist()
