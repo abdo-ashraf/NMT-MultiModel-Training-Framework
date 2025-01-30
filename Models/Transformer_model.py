@@ -81,24 +81,42 @@ class NMT_Transformer(nn.Module):
             loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId)
         return logits, loss
     
+
     @torch.no_grad
-    def translate(self, source:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId, max_tries=50):
-        """
-        Translates a source sequence into a target sequence using greedy decoding.
-        """
-        
-        source = source.unsqueeze(0)
-        B, Ts = source.shape
-        device = source.device
-        trg_tokens = torch.tensor([sos_tokenId]).unsqueeze(0).to(device)
+    def greedy_decode_fast(self, source_tensor:torch.Tensor, sos_tokenId: int, eos_tokenId:int, pad_tokenId, max_tries=50):
+        self.eval()
+        source_tensor = source_tensor.unsqueeze(0)
+        B, Ts = source_tensor.shape
+        device = source_tensor.device
+        target_tensor = torch.tensor([sos_tokenId]).unsqueeze(0).to(device)
 
-        for _ in range(max_tries):
-            logits, loss = self.forward(source=source, target=trg_tokens, pad_tokenId=pad_tokenId)
-            next_token = logits[:,-1,:].argmax(dim=-1, keepdim=True)  # Greedy decoding
+        ## Encoder Path
+        src_poses = self.positonal_shared_src_trg(torch.arange(0, Ts).to(device).unsqueeze(0).repeat(B, 1))
+        src_embedings = self.embed_shared_src_trg_cls(source_tensor) + src_poses
+        src_pad_mask = source_tensor == pad_tokenId
+        context = self.transformer_encoder(src=src_embedings, mask=None, src_key_padding_mask=src_pad_mask, is_causal=False)
+
+        for i in range(max_tries):
+            ## Decoder Path
+            trg_poses = self.positonal_shared_src_trg(torch.arange(0, i+1).to(device).unsqueeze(0).repeat(B, 1))
+            trg_embedings = self.embed_shared_src_trg_cls(target_tensor) + trg_poses
+            
+            trg_pad_mask = target_tensor == pad_tokenId
+            tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(i+1, dtype=bool).to(device)
+            decoder_out = self.transformer_decoder.forward(tgt=trg_embedings,
+                                                    memory=context,
+                                                    tgt_mask=tgt_mask,
+                                                    memory_mask=None,
+                                                    tgt_key_padding_mask=trg_pad_mask,
+                                                    memory_key_padding_mask=None)
+            ## Classifier Path
+            logits = self.classifier(decoder_out)
+            # Greedy decoding
+            top1 = logits[:,-1,:].argmax(dim=-1, keepdim=True)
             # Append predicted token
-            trg_tokens = torch.cat([trg_tokens, next_token], dim=1)
-
-            # Stop if all batches predict <EOS> (commonly token ID 3)
-            if torch.all(next_token == eos_tokenId):
+            target_tensor = torch.cat([target_tensor, top1], dim=1)
+            
+            # Stop if predict <EOS>
+            if top1.item() == eos_tokenId:
                 break
-        return trg_tokens.squeeze(0).tolist()
+        return target_tensor.squeeze(0).tolist()
