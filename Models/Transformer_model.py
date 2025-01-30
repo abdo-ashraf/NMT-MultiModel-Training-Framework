@@ -72,12 +72,13 @@ class NMT_Transformer(nn.Module):
                                                 memory_key_padding_mask=None)
         ## Classifier Path
         logits = self.classifier(decoder_out)
-
-        # for model logits we will need all tokens except the last one
-        flat_logits = logits[:,:-1,:].reshape(-1, logits.size(-1))
-        # for targets we will need all tokens excapt the first one
-        flat_targets = target[:,1:].reshape(-1)
-        loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId) if target is not None else None
+        loss = None
+        if Tt > 1:
+            # for model logits we will need all tokens except the last one
+            flat_logits = logits[:,:-1,:].reshape(-1, logits.size(-1))
+            # for targets we will need all tokens excapt the first one
+            flat_targets = target[:,1:].reshape(-1)
+            loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId)
         return logits, loss
     
     @torch.no_grad

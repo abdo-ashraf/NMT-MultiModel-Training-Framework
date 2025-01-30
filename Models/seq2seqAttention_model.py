@@ -101,10 +101,11 @@ class Seq2seq_with_attention(nn.Module):
             total_logits[:, step] = logits
             top1 = logits.argmax(-1, keepdim=True)
             step_token = target[:, [step]] if teacher_force_ratio > random.random() else top1
-
-        flat_logits = total_logits[:,1:,:].reshape(-1, total_logits.size(-1))
-        flat_targets = target[:,1:].reshape(-1)
-        loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId) if target is not None else None
+        loss = None
+        if T > 1:
+            flat_logits = total_logits[:,1:,:].reshape(-1, total_logits.size(-1))
+            flat_targets = target[:,1:].reshape(-1)
+            loss = nn.functional.cross_entropy(flat_logits, flat_targets, ignore_index=pad_tokenId)
         return total_logits, loss
     
     @torch.no_grad
