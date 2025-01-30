@@ -8,7 +8,7 @@ import os
 import argparse
 import sys
 import torch
-
+from torch.utils.data import DataLoader
 from utils import MT_Dataset, MyCollate, compute_metrics, get_parameters_info
 # import onnx
 
@@ -22,6 +22,7 @@ def parse_arguments():
 
     parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns for train')
     parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns for validation')
+    parser.add_argument('--test_csv_path', default=None, type=str, required=False, help='CSV of columns for Testing')
     parser.add_argument('--source_column_name', type=str, required=True, help='source_column_name')
     parser.add_argument('--target_column_name', type=str, required=True, help='target_column_name')
     parser.add_argument('--tokenizer_path', type=str, required=True, help='A path of tokenizer.model')
@@ -98,4 +99,20 @@ if __name__ == '__main__':
 
     train_losses, valid_losses = trainer.train()
     print("Training Done.")
-  
+
+    if args.test_csv_path is not None:
+        print("---------------------Start evaluation on test-set...---------------------")
+        test_df = pd.read_csv(args.test_csv_path)
+        test_ds = MT_Dataset(input_sentences_list=test_df[args.source_column_name].to_list(),
+                            target_sentences_list=test_df[args.target_column_name].to_list(),
+                            callable_tokenizer=tokenizer)
+
+        test_loader = DataLoader(test_ds,
+                                batch_size=training_args.batch_size,
+                                shuffle=False,
+                                collate_fn=mycollate,
+                                num_workers=training_args.cpu_num_workers,
+                                pin_memory=training_args.pin_memory)
+        metrics_dict = trainer.evaluate(test_loader)
+        print(metrics_dict)
+        print("evaluation Done.")
