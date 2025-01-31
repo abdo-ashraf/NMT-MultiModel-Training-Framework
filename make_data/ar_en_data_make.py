@@ -12,19 +12,17 @@ import os
 # !pip -q install contractions
 # !pip -q install datasets
 
-def download_data(data_type):
-    assert data_type in ['both', 'opus', 'covo'], f"Bad value for data_type={data_type}, data_type should be in ['both', 'opus', 'covo']"
+def download_data():
+    # assert data_type in ['both', 'opus', 'covo'], f"Bad value for data_type={data_type}, data_type should be in ['both', 'opus', 'covo']"
     datas = []
-    if data_type.lower() == 'both' or data_type.lower() == 'opus':
-        ds_opus = load_dataset("Helsinki-NLP/opus-100", "ar-en")
-        df_opus = pd.DataFrame(ds_opus['train']['translation'])#.rename(columns={'en': 'en', 'ar': 'ar',})
-        datas.append(df_opus)
+    ds_opus = load_dataset("Helsinki-NLP/opus-100", "ar-en")
+    df_opus = pd.DataFrame(ds_opus['train']['translation'])#.rename(columns={'en': 'en', 'ar': 'ar',})
+    datas.append(df_opus)
 
-    if data_type.lower() == 'both' or data_type.lower() == 'covo':
-        ds_covo = load_dataset("ymoslem/CoVoST2-EN-AR", "ar-en", columns=['sentence', 'translation'])
-        ds_covo = concatenate_datasets([ds_covo['train'], ds_covo['validation'], ds_covo['test']])
-        df_covo = pd.DataFrame(ds_covo).rename(columns={'translation': 'en', 'sentence': 'ar',})
-        datas.append(df_covo)
+    ds_covo = load_dataset("ymoslem/CoVoST2-EN-AR", "ar-en", columns=['sentence', 'translation'])
+    ds_covo = concatenate_datasets([ds_covo['train'], ds_covo['validation'], ds_covo['test']])
+    df_covo = pd.DataFrame(ds_covo).rename(columns={'translation': 'en', 'sentence': 'ar',})
+    datas.append(df_covo)
 
     return pd.concat(datas, axis=0, ignore_index=True)
 
@@ -140,7 +138,7 @@ def post_plot(plots_dir, filtered_data):
 
 def ar_en_data(data_dir, plots_dir, data_type, maxlen, valid_test_split, seed):
 
-    df_data = download_data(data_type)
+    df_data = download_data()
     df_data['en'] = df_data['en'].apply(clean_en)
     df_data['ar'] = df_data['ar'].apply(clean_ar)
     df_data['en_length'] = df_data['en'].apply(lambda x: len(x.split(' ')))

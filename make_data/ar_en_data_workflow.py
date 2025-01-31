@@ -4,7 +4,7 @@ import os
 
 #####-----Parameters-----#####
 # DEFAULT_OUT_DIR = './out/'
-DEFAULT_DATA = 'both' ## ('both', 'opus', 'covo')
+# DEFAULT_DATA = 'both' ## ('both', 'opus', 'covo')
 DEFAULT_MAXLEN = 20
 DEFAULT_SEED = 123
 DEFAULT_VALID_TEST_SPLIT = 0.3
@@ -15,7 +15,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Argument Parser')
 
     parser.add_argument('--out_dir', required=True, help='Working dir')
-    parser.add_argument('--data', choices=['both', 'opus', 'covo'], default=DEFAULT_DATA, help='type of needed dataset')
     parser.add_argument('--maxlen', type=int, default=DEFAULT_MAXLEN, help='maximum length of words for one example')
     parser.add_argument('--seed', type=int, default=DEFAULT_SEED, help='Random seed')
     parser.add_argument('--valid_test_split', type=float, default=DEFAULT_VALID_TEST_SPLIT, help='source character coverage')
@@ -35,4 +34,4 @@ if __name__ == '__main__':
 
 
     # Call the function with the parsed arguments
-    df_train, df_valid, df_test = ar_en_data(data_dir, plots_dir, args.data, args.maxlen, args.valid_test_split, args.seed)
+    df_train, df_valid, df_test = ar_en_data(data_dir, plots_dir, args.maxlen, args.valid_test_split, args.seed)
