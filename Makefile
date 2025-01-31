@@ -9,7 +9,7 @@ setup:
 
 data:
 	@if [ -z "$(data_type)" ]; then \
-		echo "Error: data_type is required. Available data types: 1:'ar-en", 2:'sp-en'; \
+		echo "Error: data_type is required. Available data types: 1:'ar-en', 2:'sp-en'; \
 		exit 1; \
 	fi
 
@@ -19,14 +19,14 @@ data:
 	fi
 
 	@if [ "$(data_type)" = "1" ]; then \
-	echo "Making ar_en at $(out_dir)/data/ with seed=$(seed), valid test split=$(valid_test_split) and maxlen=$(maxlen)";\
+	echo "Making ar_en data at $(out_dir)/data/ with seed=$(seed), valid_test_split=$(valid_test_split) and maxlen=$(maxlen)";\
 	    python ./make_data/ar_en_data_workflow.py \
 	        --out_dir $(out_dir) \
 	        --maxlen $(maxlen) \
 	        --seed $(seed) \
 	        --valid_test_split $(valid_test_split); \
 	elif [ "$(data_type)" = "2" ]; then \
-	echo "Making sp-en at $(out_dir)/data/ with seed=$(seed), valid test split=$(valid_test_split)";\
+	echo "Making sp-en data at $(out_dir)/data/ with seed=$(seed) and valid_test_split=$(valid_test_split)";\
 	    python ./make_data/sp_en_data_workflow.py \
 	        --out_dir $(out_dir) \
 	        --seed $(seed) \
