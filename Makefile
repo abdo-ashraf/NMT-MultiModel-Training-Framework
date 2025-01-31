@@ -39,27 +39,27 @@ data:
 
 tokenizer:
 	@if [ -z "$(train_csv_path)" ]; then \
-		echo "Error: train_csv_path is required.; \
+		echo "Error: train_csv_path is required."; \
 		exit 1; \
 	fi
 
 	@if [ -z "$(train_col1)" ]; then \
-		echo "Error: train_col1 is required.; \
+		echo "Error: train_col1 is required."; \
 		exit 1; \
 	fi
 
 	@if [ -z "$(train_col2)" ]; then \
-		echo "Error: train_col1 is required.; \
+		echo "Error: train_col1 is required."; \
 		exit 1; \
 	fi
 
 	@if [ -z "$(tokenizer_config_path)" ]; then \
-		echo "Error: tokenizer_config_path is required.; \
+		echo "Error: tokenizer_config_path is required."; \
 		exit 1; \
 	fi
 
 	@if [ -z "$(out_dir)" ]; then \
-		echo "Error: out_dir is required.; \
+		echo "Error: out_dir is required."; \
 		exit 1; \
 	fi
 
