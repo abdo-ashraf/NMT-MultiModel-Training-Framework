@@ -1,5 +1,5 @@
 {
-    "model_prefix": "./out/tokenizers/en-sp_tokenizer",
+    "model_prefix": "en-sp_tokenizer",
     "model_type": "bpe",
     "vocab_size": 6000,
     "normalization_rule_name": "nmt_nfkc_cf",
