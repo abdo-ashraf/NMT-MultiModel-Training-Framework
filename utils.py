@@ -83,51 +83,46 @@ def get_parameters_info(model):
     return names, trainable, nontrainable
 
 
-# def plot_history(history, save_plots_dir, model_type):
-
-#     fig = plt.figure(figsize=(8, 5))
-#     plt.plot(history['steps'], history['train_loss'], label="Training Loss")
-#     plt.plot(history['steps'], history['valid_loss'], label="Validation Loss")
-#     plt.plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
-#     plt.plot(history['steps'], history['valid_bleu'], label="Validation Bleu")
-#     plt.xlabel("Step")
-#     plt.ylabel("Scores")
-#     plt.legend()  # Add a legend to differentiate the lines
-#     plot_path = os.path.join(save_plots_dir, f'{model_type}_history.png')
-#     print(plot_path)
-#     plt.savefig(plot_path, dpi=300)
-#     # Close the plot to prevent it from displaying
-#     plt.close(fig)
 def plot_history(history, test_history, save_plots_dir, model_type):
-    fig, axes = plt.subplots(2, 1, figsize=(8, 8))
-
-    # Get the last step for test performance alignment
-    last_step = history['steps'][-1]
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), gridspec_kw={'width_ratios': [3, 1]})
 
     # Plot Losses
-    axes[0].plot(history['steps'], history['train_loss'], label="Training Loss")
-    axes[0].plot(history['steps'], history['valid_loss'], label="Validation Loss")
-    if test_history:
-        axes[0].scatter(last_step, test_history['test_loss'], color='red', marker='o', label="Test Loss", edgecolors='black', s=100)
-        axes[0].axhline(y=test_history['test_loss'], color='red', linestyle='--')  # Add test loss as a horizontal line
-    axes[0].set_xlabel("Step")
-    axes[0].set_ylabel("Loss")
-    axes[0].legend()
-    axes[0].set_title("Training, Validation, and Test Loss") if test_history else axes[0].set_title("Training and Validation Loss")
+    axes[0, 0].plot(history['steps'], history['train_loss'], label="Training Loss")
+    axes[0, 0].plot(history['steps'], history['valid_loss'], label="Validation Loss")
+    axes[0, 0].set_xlabel("Step")
+    axes[0, 0].set_ylabel("Loss")
+    axes[0, 0].legend()
+    axes[0, 0].set_title("Training & Validation Loss")
 
     # Plot Accuracy and BLEU
-    axes[1].plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
-    axes[1].plot(history['steps'], history['valid_bleu'], label="Validation BLEU")
+    axes[1, 0].plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
+    axes[1, 0].plot(history['steps'], history['valid_bleu'], label="Validation BLEU")
+    axes[1, 0].set_xlabel("Step")
+    axes[1, 0].set_ylabel("Scores")
+    axes[1, 0].legend()
+    axes[1, 0].set_title("Validation Accuracy & BLEU")
+
+    axes[0, 1].set_title("Test Loss")
+    axes[1, 1].set_title("Test Accuracy & BLEU")
     if test_history:
-        axes[1].scatter(last_step, test_history['test_accuracy'], color='green', marker='o', label="Test Accuracy", edgecolors='black', s=100)
-        axes[1].scatter(last_step, test_history['test_bleu'], color='blue', marker='o', label="Test BLEU", edgecolors='black', s=100)
-        axes[1].axhline(y=test_history['test_accuracy'], color='green', linestyle='--')  # Add test accuracy as a horizontal line
-        axes[1].axhline(y=test_history['test_bleu'], color='green', linestyle='--')  # Add test BLEU as a horizontal line
-    
-    axes[1].set_xlabel("Step")
-    axes[1].set_ylabel("Scores")
-    axes[1].legend()
-    axes[1].set_title("Validation and Test Accuracy/BLEU") if test_history else axes[1].set_title("Validation Accuracy/BLEU")
+        # Bar plot for test loss
+        bars1 = axes[0, 1].bar(["Test Loss"], [test_history["test_loss"]], color='red', alpha=0.7)
+        axes[0, 1].set_ylim(0, max(history['train_loss'] + history['valid_loss'] + [test_history["test_loss"]]) * 1.1)
+
+        # Bar plot for test accuracy & BLEU
+        bars2 = axes[1, 1].bar(["Test Acc"], [test_history["test_accuracy"]], color='green', alpha=0.7)
+        bars3 = axes[1, 1].bar(["Test BLEU"], [test_history["test_bleu"]], color='blue', alpha=0.7)
+        axes[1, 1].set_ylim(0, max(history['valid_accuracy'] + history['valid_bleu'] + [test_history["test_accuracy"], test_history["test_bleu"]]) * 1.1)
+
+        # Add text labels above bars
+        def add_bar_labels(bars, ax):
+            for bar in bars:
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width() / 2, height, f'{height:.3f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+        add_bar_labels(bars1, axes[0, 1])
+        add_bar_labels(bars2, axes[1, 1])
+        add_bar_labels(bars3, axes[1, 1])
 
     plt.tight_layout()  # Adjust layout to prevent overlap
 
