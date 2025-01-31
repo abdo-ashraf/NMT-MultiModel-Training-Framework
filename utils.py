@@ -93,7 +93,8 @@ def plot_history(history, save_plots_dir, model_type):
     plt.xlabel("Step")
     plt.ylabel("Scores")
     plt.legend()  # Add a legend to differentiate the lines
-    plot_path = save_plots_dir+f'{model_type}_history.png'
+    plot_path = os.path.join(save_plots_dir, f'{model_type}_history.png')
+    print(plot_path)
     plt.savefig(plot_path, dpi=300)
     # Close the plot to prevent it from displaying
     plt.close(fig)

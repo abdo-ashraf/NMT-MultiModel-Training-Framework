@@ -160,7 +160,8 @@ class Trainer():
         to_return = {}
         for name, values_list in results_dict.items():
             if 'accuracy' in name.lower() or 'bleu' in name.lower():
-                to_return[name] = round(sum(values_list)/len(values_list)*100, 2)
+                to_return[name] = round(sum(values_list)/len(values_list), 4)
+                # to_return[name] = round(sum(values_list)/len(values_list)*100, 2)
             else:
                 to_return[name] = round(sum(values_list)/len(values_list), 4)
         return to_return
