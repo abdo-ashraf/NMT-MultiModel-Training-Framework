@@ -41,8 +41,8 @@ data:
 tokenizer:
 # Check for required parameters
 	@for var in train_csv_path train_col1 train_col2 tokenizer_config_path out_dir; do \
-		if [ -z "$(var)" ]; then \
-			echo "Error: $(var) is required."; \
+		if [ -z "$$var" ]; then \
+			echo "Error: $$var is required."; \
 			exit 1; \
 		fi \
 	done
