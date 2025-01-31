@@ -9,7 +9,7 @@ setup:
 
 data:
 	@if [ -z "$(data_type)" ]; then \
-		echo "Error: data_type is required. Available data types: 1:'ar-en', 2:'sp-en'; \
+		echo "Error: data_type is required. Available data types: 1:'ar-en', 2:'sp-en'""; \
 		exit 1; \
 	fi
 
