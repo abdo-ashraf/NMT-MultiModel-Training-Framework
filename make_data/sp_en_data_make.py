@@ -7,8 +7,7 @@ import re
 import os
 
 
-def sp_en_data(out_dir, valid_test_split, seed):
-    os.makedirs(out_dir, exist_ok=True)
+def sp_en_data(data_dir, valid_test_split, seed):
 
     text_file = keras.utils.get_file(
         fname="spa-eng.zip",
@@ -39,8 +38,8 @@ def sp_en_data(out_dir, valid_test_split, seed):
     df_valid = pd.DataFrame(val_pairs, columns=['en', 'sp'])
     df_test = pd.DataFrame(test_pairs, columns=['en', 'sp'])
     print(df_train.shape, df_test.shape, df_valid.shape, sep=', ')
-    df_train.to_csv(os.path.join(out_dir, 'sp-en_train.csv'), index=False)
-    df_valid.to_csv(os.path.join(out_dir, 'sp-en_valid.csv'), index=False)
-    df_test.to_csv(os.path.join(out_dir, 'sp-en_test.csv'), index=False)
+    df_train.to_csv(os.path.join(data_dir, 'sp-en_train.csv'), index=False)
+    df_valid.to_csv(os.path.join(data_dir, 'sp-en_valid.csv'), index=False)
+    df_test.to_csv(os.path.join(data_dir, 'sp-en_test.csv'), index=False)
 
     return df_train, df_valid, df_test

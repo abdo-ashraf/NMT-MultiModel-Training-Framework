@@ -1,5 +1,6 @@
 import argparse
 from ar_en_data_make import ar_en_data
+import os
 
 #####-----Parameters-----#####
 # DEFAULT_OUT_DIR = './out/'
@@ -27,5 +28,11 @@ if __name__ == '__main__':
     parser = parse_arguments()
     args = parser.parse_args()
 
+    data_dir = os.path.join(args.out_dir, 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    plots_dir = os.path.join(args.out_dir, 'plots')
+    os.makedirs(plots_dir, exist_ok=True)
+
+
     # Call the function with the parsed arguments
-    df_train, df_valid, df_test = ar_en_data(args.out_dir, args.data, args.maxlen, args.valid_test_split, args.seed)
+    df_train, df_valid, df_test = ar_en_data(data_dir, plots_dir, args.data, args.maxlen, args.valid_test_split, args.seed)

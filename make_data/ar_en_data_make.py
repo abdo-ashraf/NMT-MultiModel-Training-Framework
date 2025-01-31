@@ -138,8 +138,7 @@ def post_plot(plots_dir, filtered_data):
     # Close the plot to prevent it from displaying
     plt.close(fig)
 
-def ar_en_data(out_dir, data_type, maxlen, valid_test_split, seed):
-    os.makedirs(out_dir, exist_ok=True)
+def ar_en_data(data_dir, plots_dir, data_type, maxlen, valid_test_split, seed):
 
     df_data = download_data(data_type)
     df_data['en'] = df_data['en'].apply(clean_en)
@@ -147,17 +146,17 @@ def ar_en_data(out_dir, data_type, maxlen, valid_test_split, seed):
     df_data['en_length'] = df_data['en'].apply(lambda x: len(x.split(' ')))
     df_data['ar_length'] = df_data['ar'].apply(lambda x: len(x.split(' ')))
 
-    pre_plot(out_dir, df_data)
+    pre_plot(plots_dir, df_data)
     filtered_data = drop(df_data, maxlen)
-    post_plot(out_dir, filtered_data)
+    post_plot(plots_dir, filtered_data)
 
     df_train, df_test = train_test_split(filtered_data, test_size=valid_test_split, shuffle=True, random_state=seed)
     df_valid, df_test = train_test_split(df_test, test_size=0.5, shuffle=True, random_state=seed)
     print(df_train.shape, df_test.shape, df_valid.shape, sep=', ')
 
-    df_train.to_csv(os.path.join(out_dir,'ar-en_train.csv'), index=False)
-    df_valid.to_csv(os.path.join(out_dir,'ar-en_valid.csv'), index=False)
-    df_test.to_csv(os.path.join(out_dir,'ar-en_test.csv'), index=False)
+    df_train.to_csv(os.path.join(data_dir,'ar-en_train.csv'), index=False)
+    df_valid.to_csv(os.path.join(data_dir,'ar-en_valid.csv'), index=False)
+    df_test.to_csv(os.path.join(data_dir,'ar-en_test.csv'), index=False)
 
     return df_train, df_valid, df_test
 
