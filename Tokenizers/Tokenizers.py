@@ -12,7 +12,7 @@ def train(train_csv_path:str, tokenizer_params:dict, train_on_columns:list, toke
     sentences = []
     for col in train_on_columns:
         sentences = sentences + dataframe[col].to_list()
-    tokenizer_params['model_prefix'] = os.path.join(tokenizer_params, tokenizer_params['model_prefix'])
+    tokenizer_params['model_prefix'] = os.path.join(tokenizer_path, tokenizer_params['model_prefix'])
     spm.SentencePieceTrainer.train(sentence_iterator=iter(sentences), **tokenizer_params)
 
     print(f"{tokenizer_params['model_prefix']} Done")
