@@ -95,8 +95,8 @@ def plot_history(history, test_history, save_plots_dir, model_type):
     axes[0, 0].set_title("Training & Validation Loss")
 
     # Plot Accuracy and BLEU
-    axes[1, 0].plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
-    axes[1, 0].plot(history['steps'], history['valid_bleu'], label="Validation BLEU")
+    axes[1, 0].plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy", color='blue')
+    axes[1, 0].plot(history['steps'], history['valid_bleu'], label="Validation BLEU", color='orange')
     axes[1, 0].set_xlabel("Step")
     axes[1, 0].set_ylabel("Scores")
     axes[1, 0].legend()
@@ -106,12 +106,12 @@ def plot_history(history, test_history, save_plots_dir, model_type):
     axes[1, 1].set_title("Test Accuracy & BLEU")
     if test_history:
         # Bar plot for test loss
-        bars1 = axes[0, 1].bar(["Test Loss"], [test_history["test_loss"]], color='red', alpha=0.7)
+        bars1 = axes[0, 1].bar(["Test Loss"], [test_history["test_loss"]], color='green', alpha=0.7)
         axes[0, 1].set_ylim(0, max(history['train_loss'] + history['valid_loss'] + [test_history["test_loss"]]) * 1.1)
 
         # Bar plot for test accuracy & BLEU
-        bars2 = axes[1, 1].bar(["Test Acc"], [test_history["test_accuracy"]], color='green', alpha=0.7)
-        bars3 = axes[1, 1].bar(["Test BLEU"], [test_history["test_bleu"]], color='blue', alpha=0.7)
+        bars2 = axes[1, 1].bar(["Test Acc"], [test_history["test_accuracy"]], color='blue', alpha=0.7)
+        bars3 = axes[1, 1].bar(["Test BLEU"], [test_history["test_bleu"]], color='orange', alpha=0.7)
         axes[1, 1].set_ylim(0, max(history['valid_accuracy'] + history['valid_bleu'] + [test_history["test_accuracy"], test_history["test_bleu"]]) * 1.1)
 
         # Add text labels above bars
