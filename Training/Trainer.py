@@ -132,7 +132,7 @@ class Trainer():
     
 
     @torch.no_grad()
-    def evaluate(self, dataloader=None):
+    def evaluate(self, dataloader=None, set_name='valid'):
         loader = self.valid_loader if dataloader is None else dataloader
         self.model = self.model.eval()
         results_dict = defaultdict(list)
@@ -152,14 +152,14 @@ class Trainer():
 
             candidates = torch.argmax(class_logits, dim=-1)
             metrics_dict = self.compute_metrics_func(labels_forward[:,1:], candidates[:,:-1], self.collator.pad_value)
-            metrics_dict["valid_Loss"] = item_total_loss.item()
+            metrics_dict['loss'] = item_total_loss.item()
 
             for metric, value in metrics_dict.items():
-                results_dict[metric].append(value)
+                results_dict[set_name+"_"+metric].append(value)
 
         to_return = {}
         for name, values_list in results_dict.items():
-            if name.lower() == "valid_accuracy" or name.lower() == "valid_bleu":
+            if 'accuracy' in name.lower() or 'bleu' in name.lower():
                 to_return[name] = round(sum(values_list)/len(values_list)*100, 2)
             else:
                 to_return[name] = round(sum(values_list)/len(values_list), 4)
