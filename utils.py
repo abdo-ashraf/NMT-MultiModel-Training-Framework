@@ -131,15 +131,16 @@ def plot_history(history, test_history, save_plots_dir, model_type):
     plt.close(fig)
 
 
-def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str, step:int, in_onnx=False):
-    model_path = os.path.join(save_dir, f"{run_name}_step_{step}.pth")
+def save_checkpoint(model:torch.nn.Module, optimizer, save_dir:str, run_name:str, in_onnx=False):
+    model_path = os.path.join(save_dir, f"{run_name}")
     if in_onnx:
         ## onnx
+        model_path = model_path+'.onnx'
         print("Saving in Onnx format not supported for now.")
     else:
         ## pytorch
-        torch.save({'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict()}, model_path)
+        model_path = model_path+'.pth'
+        torch.save({'model_state_dict': model.state_dict()}, model_path)
     print(f"Checkpoint saved at: {model_path}")
 
 

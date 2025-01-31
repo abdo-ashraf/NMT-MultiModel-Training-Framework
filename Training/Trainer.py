@@ -123,7 +123,6 @@ class Trainer():
                                     optimizer=optimizer,
                                     save_dir=self.args.save_models_dir,
                                     run_name=self.args.run_name,
-                                    step=step,
                                     in_onnx=self.args.onnx)
 
         tqdm_loop.close()

@@ -9,11 +9,7 @@ import argparse
 import sys
 from torch.utils.data import DataLoader
 from utils import MT_Dataset, MyCollate, compute_metrics, get_parameters_info, plot_history
-# import onnx
 
-## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
-## Tokenizer params: src_vocab_size, trg_vocab_size, out_dir, lang1_model_prefix, lang2_model_prefix, lang1_character_coverage, lang2_character_coverage
-## Model params: model_type, epochs, dim_embed, dim_model, dim_feedforward, num_layers, dropout, learning_rate, weight_decay, out_dir
 
 # Command-Line Arguments
 def parse_arguments():
