@@ -59,6 +59,7 @@ class Trainer():
         history = defaultdict(list)
         # train_losses = []
         step=0
+        best_valid_bleu = -1  # Assuming BLEU score is always non-negative
         train_loader_iter = iter(self.train_loader)  # Create an iterator for the train_loader
 
         tqdm_loop = tqdm(total=self.args.max_steps, position=0)
@@ -101,7 +102,7 @@ class Trainer():
             step += 1
             tqdm_loop.update(1)
             tqdm_loop.set_description(f"Step [{step}/{self.args.max_steps}]")
-            tqdm_loop.set_postfix_str(f'loss={round(loss.item(), 4)}')
+            tqdm_loop.set_postfix_str(f'loss={round(loss.item(), 4)}\n')
 
             if self.args.eval_steps != 0 and self.args.eval_steps is not None:
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
@@ -114,16 +115,26 @@ class Trainer():
                     for metric, value in metrics.items():
                         history[metric].append(value)
                     print(f'Validation step-{step}: {metrics}')
+                    # Check if the current BLEU score is better than or equal to the best BLEU score
+                    if metrics['valid_bleu'] >= best_valid_bleu:
+                        best_valid_bleu = metrics['bleu']  # Update the best BLEU score
+                        # Save the model checkpoint
+                        print(f'Saving model checkpoint at step-{step} with BLEU score: {best_valid_bleu}')
+                        save_checkpoint(model=self.model,
+                                        optimizer=optimizer,
+                                        save_dir=self.args.save_models_dir,
+                                        run_name=self.args.run_name,
+                                        in_onnx=self.args.onnx)
                     self.model = self.model.train()
                 
-            # Save model at specific intervals
-            if self.args.save_steps != 0 and self.args.save_steps is not None:
-                if step % self.args.save_steps == 0 or step == self.args.max_steps:
-                    save_checkpoint(model=self.model,
-                                    optimizer=optimizer,
-                                    save_dir=self.args.save_models_dir,
-                                    run_name=self.args.run_name,
-                                    in_onnx=self.args.onnx)
+            # # Save model at specific intervals
+            # if self.args.save_steps != 0 and self.args.save_steps is not None:
+            #     if step % self.args.save_steps == 0 or step == self.args.max_steps:
+            #         save_checkpoint(model=self.model,
+            #                         optimizer=optimizer,
+            #                         save_dir=self.args.save_models_dir,
+            #                         run_name=self.args.run_name,
+            #                         in_onnx=self.args.onnx)
 
         tqdm_loop.close()
         print("Model Training Done.")
