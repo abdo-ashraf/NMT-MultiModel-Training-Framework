@@ -117,5 +117,6 @@ if __name__ == '__main__':
         metrics_dict = trainer.evaluate(test_loader)
         print(metrics_dict)
         print("evaluation Done.")
-
+        
+    print(history)
     # plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)
