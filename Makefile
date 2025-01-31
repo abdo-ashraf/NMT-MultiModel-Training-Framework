@@ -1,6 +1,8 @@
+# Set default for optional test_csv_path if not provided
 seed ?= 123
 valid_test_split ?= 0.1
 maxlen ?= 25
+test_csv_path ?= None
 
 .PHONY: setup data tokenizer model
 
@@ -109,9 +111,6 @@ model:
 		echo "Error: model_type is required."; \
 		exit 1; \
 	fi
-
-# Set default for optional test_csv_path if not provided
-	@test_csv_path ?= None
 
 	@echo "Making $(model_type) model at $(out_dir)/models/ with ";
 	@echo "train_csv_path=$(train_csv_path) ";
