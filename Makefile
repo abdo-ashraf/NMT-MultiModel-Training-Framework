@@ -67,7 +67,7 @@ model:
 	done
 
 # Set default for optional test_csv_path if not provided
-	test_csv_path ?= None
+	@test_csv_path ?= None
 
 	@echo "Making $(model_type) model at $(out_dir)/models/ with ";
 	@echo "train_csv_path=$(train_csv_path) ";
