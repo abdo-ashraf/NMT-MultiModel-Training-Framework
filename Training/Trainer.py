@@ -56,9 +56,8 @@ class Trainer():
         else: 
             print("Using TF16")
 
+        history = defaultdict(list)
         train_losses = []
-        valid_metrics = []
-        valid_metric = []
         steps = []
         step=0
         train_loader_iter = iter(self.train_loader)  # Create an iterator for the train_loader
@@ -91,6 +90,7 @@ class Trainer():
             # Backward
             optimizer.zero_grad()
             loss.backward()
+            train_losses.append(loss.item())
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
 
             curr_lr = self.lr_sch.get_lr(step=step)
@@ -106,10 +106,13 @@ class Trainer():
 
             if self.args.eval_steps != 0 and self.args.eval_steps is not None:
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
-                    train_losses.append(loss.item())
-                    steps.append(step)
+                    mean_loss = sum(train_losses)/len(train_losses)
+                    train_losses = []
+                    history['train_loss'].append(mean_loss)
+                    history['steps'].append(step)
                     metrics = self.evaluate()
-                    valid_metrics.append(metrics)
+                    for metric, value in metrics.items():
+                        history[metric].append(value)
                     print(f'Validation step-{step}: {metrics}')
                     self.model = self.model.train()
                 
@@ -125,10 +128,7 @@ class Trainer():
 
         tqdm_loop.close()
         print("Model Training Done.")
-
-        # plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)
-
-        return train_losses, valid_metrics
+        return history
     
 
     @torch.no_grad()
@@ -152,14 +152,14 @@ class Trainer():
 
             candidates = torch.argmax(class_logits, dim=-1)
             metrics_dict = self.compute_metrics_func(labels_forward[:,1:], candidates[:,:-1], self.collator.pad_value)
-            metrics_dict["Loss"] = item_total_loss.item()
+            metrics_dict["valid_Loss"] = item_total_loss.item()
 
-            for metric in metrics_dict.keys():
-                results_dict[metric].append(metrics_dict[metric])
+            for metric, value in metrics_dict.items():
+                results_dict[metric].append(value)
 
         to_return = {}
         for name, values_list in results_dict.items():
-            if name.lower() == "accuracy" or name.lower() == "bleu":
+            if name.lower() == "valid_accuracy" or name.lower() == "valid_bleu":
                 to_return[name] = round(sum(values_list)/len(values_list)*100, 2)
             else:
                 to_return[name] = round(sum(values_list)/len(values_list), 4)

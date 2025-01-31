@@ -28,6 +28,7 @@ def parse_arguments():
     parser.add_argument('--tokenizer_path', type=str, required=True, help='A path of tokenizer.model')
     parser.add_argument('--model_config_path', type=str, required=True, help='A path for model configuration file')
     parser.add_argument('--training_config_path', type=str, required=True, help='A path for training configuration file')
+    parser.add_argument('--out_dir', type=str, required=True, help='A path for output directory')
     
     return parser
  
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     assert os.path.exists(args.tokenizer_path), f"{args.tokenizer_path} : Tokenizer.model not found."
     assert os.path.exists(args.model_config_path), f"{args.model_config_path} : Model configuration file not found."
     assert os.path.exists(args.training_config_path), f"{args.training_config_path} : Training configuration file not found."
-    
+    os.makedirs(args.out_dir, exist_ok=True)
 
     print("---------------------Starting Tokenizer Loading...---------------------")
     tokenizer = Callable_tokenizer(args.tokenizer_path)
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     print("Model Loading Done.")
     
     print("---------------------Parsing Training arguments...---------------------")
-    training_args = TrainingArguments(args.training_config_path)
+    training_args = TrainingArguments(args.out_dir, args.training_config_path)
     print(training_args)
     print("Parsing Done.")
 
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                         train_ds=train_ds, valid_ds=valid_ds,
                         collator=mycollate, compute_metrics_func=compute_metrics)
 
-    train_losses, valid_losses = trainer.train()
+    history = trainer.train()
     print("Training Done.")
 
     if args.test_csv_path is not None:
@@ -116,3 +117,5 @@ if __name__ == '__main__':
         metrics_dict = trainer.evaluate(test_loader)
         print(metrics_dict)
         print("evaluation Done.")
+
+    # plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)

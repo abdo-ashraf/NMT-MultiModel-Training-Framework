@@ -127,7 +127,7 @@ def compute_metrics(references:torch.Tensor, candidates:torch.Tensor, ignore_ind
     accuracy = total_accu / batch_size
     # accuracy = accuracy_score(references.cpu().reshape(-1), candidates.cpu().reshape(-1))
     
-    return  {"Accuracy": accuracy, "Bleu": bleu}
+    return  {"valid_accuracy": accuracy, "valid_bleu": bleu}
 
 
 class CosineScheduler():
