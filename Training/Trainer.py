@@ -102,7 +102,7 @@ class Trainer():
             step += 1
             tqdm_loop.update(1)
             tqdm_loop.set_description(f"Step [{step}/{self.args.max_steps}]")
-            tqdm_loop.set_postfix_str(f'loss={round(loss.item(), 4)}\n')
+            tqdm_loop.set_postfix_str(f'loss={round(loss.item(), 4)}')
 
             if self.args.eval_steps != 0 and self.args.eval_steps is not None:
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
@@ -114,7 +114,7 @@ class Trainer():
                     metrics = self.evaluate()
                     for metric, value in metrics.items():
                         history[metric].append(value)
-                    print(f'Validation step-{step}: {metrics}')
+                    print(f'\nValidation step-{step}: {metrics}')
                     # Check if the current BLEU score is better than or equal to the best BLEU score
                     if metrics['valid_bleu'] >= best_valid_bleu:
                         best_valid_bleu = metrics['bleu']  # Update the best BLEU score
