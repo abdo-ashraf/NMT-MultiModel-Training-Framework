@@ -36,15 +36,36 @@ data:
 	    exit 1; \
 	fi
 
-tokenizer_config_path ?= ./Configurations/tokenizer_config.json
-train_csv_path ?= ./data/train.csv
-col1 ?= text  # Default column names if not passed
-col2 ?= target
 
 tokenizer:
+	@if [ -z "$(train_csv_path)" ]; then \
+		echo "Error: train_csv_path is required.; \
+		exit 1; \
+	fi
+
+	@if [ -z "$(train_col1)" ]; then \
+		echo "Error: train_col1 is required.; \
+		exit 1; \
+	fi
+
+	@if [ -z "$(train_col2)" ]; then \
+		echo "Error: train_col1 is required.; \
+		exit 1; \
+	fi
+
+	@if [ -z "$(tokenizer_config_path)" ]; then \
+		echo "Error: tokenizer_config_path is required.; \
+		exit 1; \
+	fi
+
+	@if [ -z "$(out_dir)" ]; then \
+		echo "Error: out_dir is required.; \
+		exit 1; \
+	fi
+
 	@echo "Making tokenizer at $(out_dir)/tokenizers/"; \
 	python ./Tokenizers/tokenizers_workflow.py \
 		--train_csv_path $(train_csv_path) \
-		--train_on_columns $(col1) $(col2) \
+		--train_on_columns $(train_col1) $(train_col2) \
 		--config_path $(tokenizer_config_path) \
 		--out_dir $(out_dir)
