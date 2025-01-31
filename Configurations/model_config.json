@@ -1,5 +1,4 @@
 {
-    "model_type": "transformer",
     "dim_embed": 256,
     "dim_model": 256,
     "dim_feedforward": 1024,

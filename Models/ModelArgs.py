@@ -4,7 +4,7 @@ class ModelArgs:
     """
     A class to parse and store model configuration from a JSON file.
     """
-    def __init__(self, config_path: str):
+    def __init__(self, model_type:str, config_path:str):
         """
         Initialize ModelArgs with configuration from a JSON file.
 
@@ -19,7 +19,7 @@ class ModelArgs:
             config = json.load(file)
         
         # Validate and assign attributes
-        self.model_type = config.get("model_type", "").lower()
+        self.model_type = model_type.lower()
         assert self.model_type in ['s2s', 's2sattention', 'transformer'], \
             "Supported model_type values are ['s2s', 's2sAttention', 'transformer']."
         

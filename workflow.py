@@ -28,6 +28,8 @@ def parse_arguments():
     parser.add_argument('--model_config_path', type=str, required=True, help='A path for model configuration file')
     parser.add_argument('--training_config_path', type=str, required=True, help='A path for training configuration file')
     parser.add_argument('--out_dir', type=str, required=True, help='A path for output directory')
+    parser.add_argument('--model_type', type=str, required=True, choices=['s2s', 's2sAttention', 'transformer'],
+                    help='A type of model (choices: s2s, s2sAttention, transformer)')
     
     return parser
  
@@ -75,7 +77,7 @@ if __name__ == '__main__':
     print("Data Loading Done.")
 
     print("---------------------Parsing Model arguments...---------------------")
-    model_args = ModelArgs(config_path=args.model_config_path)
+    model_args = ModelArgs(model_type=args.model_type, config_path=args.model_config_path)
     print(model_args)
     print("Parsing Done.")
 
@@ -120,4 +122,4 @@ if __name__ == '__main__':
 
     save_plots_dir = os.path.join(args.out_dir, 'plots')
     os.makedirs(save_plots_dir, exist_ok=True)
-    plot_history(history, test_metrics, save_plots_dir, model_args.model_type)
+    plot_history(history, test_metrics, save_plots_dir, training_args.run_name)
