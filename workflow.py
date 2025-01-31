@@ -45,7 +45,7 @@ if __name__ == '__main__':
     assert os.path.exists(args.training_config_path), f"{args.training_config_path} : Training configuration file not found."
     test_csv_path = args.test_csv_path
     if not os.path.exists(test_csv_path):
-        print(f"Test csv path: {test_csv_path} does not exists test_csv_path will set to None")
+        print(f"Test_csv path: '{test_csv_path}' does not exists, test_csv_path will set to None")
         test_csv_path = None
 
     os.makedirs(args.out_dir, exist_ok=True)
