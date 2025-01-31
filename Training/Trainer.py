@@ -117,7 +117,7 @@ class Trainer():
                     print(f'\nValidation step-{step}: {metrics}')
                     # Check if the current BLEU score is better than or equal to the best BLEU score
                     if metrics['valid_bleu'] >= best_valid_bleu:
-                        best_valid_bleu = metrics['bleu']  # Update the best BLEU score
+                        best_valid_bleu = metrics['valid_bleu']  # Update the best BLEU score
                         # Save the model checkpoint
                         print(f'Saving model checkpoint at step-{step} with BLEU score: {best_valid_bleu}')
                         save_checkpoint(model=self.model,
