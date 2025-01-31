@@ -1,5 +1,3 @@
-data_type ?= 1  # Default to 1 if data_type isn't passed
-out_dir ?= ./out  # Default to ./out/ if out_dir isn't passed
 seed ?= 123
 valid_test_split ?= 0.1
 maxlen ?= 25
@@ -10,6 +8,16 @@ setup:
 	pip install -r requirements.txt
 
 data:
+	@if [ -z "$(data_type)" ]; then \
+		echo "Error: data_type is required. Please set it."; \
+		exit 1; \
+	fi
+
+	@if [ -z "$(out_dir)" ]; then \
+		echo "Error: out_dir is required. Please set it."; \
+		exit 1; \
+	fi
+
 	@if [ "$(data_type)" = "1" ]; then \
 	echo "Making ar_en at $(out_dir)/data/";\
 	    python ./make_data/ar_en_data_workflow.py \
