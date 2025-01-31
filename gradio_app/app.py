@@ -17,7 +17,7 @@ def en_translate_ar(text, model, tokenizer, max_tries=50):
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 tokenizer = Callable_tokenizer('./out/tokenizers/en-ar_tokenizer.model')
 
-model_state_dict = torch.load("./out/models/en-ar_s2sattention.pth", map_location=device, weights_only=True)['model_state_dict']
+model_state_dict = torch.load("./out/models/en-ar_s2sAttention.pth", map_location=device, weights_only=True)['model_state_dict']
 model_args = ModelArgs('s2sattention', "./Configurations/s2sattention_model_config.json")
 s2sattention = get_model(model_args, len(tokenizer))
 s2sattention.load_state_dict(model_state_dict)
