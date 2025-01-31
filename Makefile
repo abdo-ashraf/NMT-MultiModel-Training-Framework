@@ -40,12 +40,26 @@ data:
 
 tokenizer:
 # Check for required parameters
-	@for var in train_csv_path train_col1 train_col2 tokenizer_config_path out_dir; do \
-		if [ -z "$$var" ]; then \
-			echo "Error: $$var is required."; \
-			exit 1; \
-		fi \
-	done
+	@if [ -z "$(train_csv_path)" ]; then \
+		echo "Error: train_csv_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(train_col1)" ]; then \
+		echo "Error: train_col1 is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(train_col2)" ]; then \
+		echo "Error: train_col2 is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(tokenizer_config_path)" ]; then \
+		echo "Error: tokenizer_config_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(out_dir)" ]; then \
+		echo "Error: out_dir is required."; \
+		exit 1; \
+	fi
 
 	@echo "Making tokenizer at $(out_dir)/tokenizers/ ";
 	@echo "with configurations at $(tokenizer_config_path) ";
@@ -59,12 +73,42 @@ tokenizer:
 
 model:
 # Check for required parameters
-	@for var in train_csv_path valid_csv_path source_column_name target_column_name tokenizer_path model_config_path training_config_path out_dir model_type; do \
-		if [ -z "$$var" ]; then \
-			echo "Error: $$var is required."; \
-			exit 1; \
-		fi \
-	done
+	@if [ -z "$(train_csv_path)" ]; then \
+		echo "Error: train_csv_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(valid_csv_path)" ]; then \
+		echo "Error: valid_csv_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(source_column_name)" ]; then \
+		echo "Error: source_column_name is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(target_column_name)" ]; then \
+		echo "Error: target_column_name is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(tokenizer_path)" ]; then \
+		echo "Error: tokenizer_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(model_config_path)" ]; then \
+		echo "Error: model_config_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(training_config_path)" ]; then \
+		echo "Error: training_config_path is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(out_dir)" ]; then \
+		echo "Error: out_dir is required."; \
+		exit 1; \
+	fi
+	@if [ -z "$(model_type)" ]; then \
+		echo "Error: model_type is required."; \
+		exit 1; \
+	fi
 
 # Set default for optional test_csv_path if not provided
 	@test_csv_path ?= None
