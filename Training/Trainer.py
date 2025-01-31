@@ -57,8 +57,7 @@ class Trainer():
             print("Using TF16")
 
         history = defaultdict(list)
-        train_losses = []
-        steps = []
+        # train_losses = []
         step=0
         train_loader_iter = iter(self.train_loader)  # Create an iterator for the train_loader
 
@@ -90,7 +89,7 @@ class Trainer():
             # Backward
             optimizer.zero_grad()
             loss.backward()
-            train_losses.append(loss.item())
+            # train_losses.append(loss.item())
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
 
             curr_lr = self.lr_sch.get_lr(step=step)
@@ -106,9 +105,10 @@ class Trainer():
 
             if self.args.eval_steps != 0 and self.args.eval_steps is not None:
                 if step % self.args.eval_steps == 0 or step == self.args.max_steps:
-                    mean_loss = sum(train_losses)/len(train_losses)
-                    train_losses = []
-                    history['train_loss'].append(mean_loss)
+                    # mean_loss = round(sum(train_losses)/len(train_losses), 4)
+                    # train_losses = []
+                    # history['train_loss'].append(mean_loss)
+                    history['train_loss'].append(round(loss.item(), 4))
                     history['steps'].append(step)
                     metrics = self.evaluate()
                     for metric, value in metrics.items():
