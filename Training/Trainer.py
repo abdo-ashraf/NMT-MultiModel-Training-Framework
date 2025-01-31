@@ -59,7 +59,7 @@ class Trainer():
         history = defaultdict(list)
         # train_losses = []
         step=0
-        best_valid_bleu = -1  # Assuming BLEU score is always non-negative
+        best_valid_bleu = float("-inf")  # Assuming BLEU score is always non-negative
         train_loader_iter = iter(self.train_loader)  # Create an iterator for the train_loader
 
         tqdm_loop = tqdm(total=self.args.max_steps, position=0)
