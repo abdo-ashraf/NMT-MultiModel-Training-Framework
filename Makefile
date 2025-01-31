@@ -63,9 +63,11 @@ tokenizer:
 		exit 1; \
 	fi
 
-	@echo "Making tokenizer at $(out_dir)/tokenizers/"; \
+	@echo "Making tokenizer at $(out_dir)/tokenizers/ with configurations at $(tokenizer_config_path) on Columns '$(train_col1)', '$(train_col2)' of $(train_csv_path) csv"; \
 	python ./Tokenizers/tokenizers_workflow.py \
 		--train_csv_path $(train_csv_path) \
 		--train_on_columns $(train_col1) $(train_col2) \
 		--config_path $(tokenizer_config_path) \
 		--out_dir $(out_dir)
+
+model:
