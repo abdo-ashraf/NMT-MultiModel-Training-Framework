@@ -98,11 +98,9 @@ if __name__ == '__main__':
                         collator=mycollate, compute_metrics_func=compute_metrics)
 
     history = trainer.train()
-    save_plots_dir = os.path.join(args.out_dir, 'plots')
-    os.makedirs(save_plots_dir, exist_ok=True)
-    plot_history(history, save_plots_dir, model_args.model_type)
-    print(f"Training Done, plots saved at {save_plots_dir}")
+    print(f"Training Done.")
 
+    test_metrics=None
     if args.test_csv_path is not None:
         print("---------------------Start evaluation on test-set...---------------------")
         test_df = pd.read_csv(args.test_csv_path)
@@ -119,3 +117,7 @@ if __name__ == '__main__':
         test_metrics = trainer.evaluate(dataloader=test_loader, set_name='test')
         print(test_metrics)
         print("evaluation Done.")
+
+    save_plots_dir = os.path.join(args.out_dir, 'plots')
+    os.makedirs(save_plots_dir, exist_ok=True)
+    plot_history(history, test_metrics, save_plots_dir, model_args.model_type)

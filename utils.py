@@ -83,20 +83,56 @@ def get_parameters_info(model):
     return names, trainable, nontrainable
 
 
-def plot_history(history, save_plots_dir, model_type):
+# def plot_history(history, save_plots_dir, model_type):
 
-    fig = plt.figure(figsize=(8, 3))
-    plt.plot(history['steps'], history['train_loss'], label="Training Loss")
-    plt.plot(history['steps'], history['valid_loss'], label="Validation Loss")
-    plt.plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
-    plt.plot(history['steps'], history['valid_bleu'], label="Validation Bleu")
-    plt.xlabel("Step")
-    plt.ylabel("Scores")
-    plt.legend()  # Add a legend to differentiate the lines
+#     fig = plt.figure(figsize=(8, 5))
+#     plt.plot(history['steps'], history['train_loss'], label="Training Loss")
+#     plt.plot(history['steps'], history['valid_loss'], label="Validation Loss")
+#     plt.plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
+#     plt.plot(history['steps'], history['valid_bleu'], label="Validation Bleu")
+#     plt.xlabel("Step")
+#     plt.ylabel("Scores")
+#     plt.legend()  # Add a legend to differentiate the lines
+#     plot_path = os.path.join(save_plots_dir, f'{model_type}_history.png')
+#     print(plot_path)
+#     plt.savefig(plot_path, dpi=300)
+#     # Close the plot to prevent it from displaying
+#     plt.close(fig)
+def plot_history(history, test_history, save_plots_dir, model_type):
+    fig, axes = plt.subplots(2, 1, figsize=(8, 8))
+
+    # Get the last step for test performance alignment
+    last_step = history['steps'][-1]
+
+    # Plot Losses
+    axes[0].plot(history['steps'], history['train_loss'], label="Training Loss")
+    axes[0].plot(history['steps'], history['valid_loss'], label="Validation Loss")
+    if test_history:
+        axes[0].scatter(last_step, test_history['test_loss'], color='red', marker='o', label="Test Loss", edgecolors='black', s=100)
+        axes[0].axhline(y=test_history['test_loss'], color='red', linestyle='--')  # Add test loss as a horizontal line
+    axes[0].set_xlabel("Step")
+    axes[0].set_ylabel("Loss")
+    axes[0].legend()
+    axes[0].set_title("Training, Validation, and Test Loss") if test_history else axes[0].set_title("Training and Validation Loss")
+
+    # Plot Accuracy and BLEU
+    axes[1].plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
+    axes[1].plot(history['steps'], history['valid_bleu'], label="Validation BLEU")
+    if test_history:
+        axes[1].scatter(last_step, test_history['test_accuracy'], color='green', marker='o', label="Test Accuracy", edgecolors='black', s=100)
+        axes[1].scatter(last_step, test_history['test_bleu'], color='blue', marker='o', label="Test BLEU", edgecolors='black', s=100)
+        axes[1].axhline(y=test_history['test_accuracy'], color='green', linestyle='--')  # Add test accuracy as a horizontal line
+        axes[1].axhline(y=test_history['test_bleu'], color='green', linestyle='--')  # Add test BLEU as a horizontal line
+    
+    axes[1].set_xlabel("Step")
+    axes[1].set_ylabel("Scores")
+    axes[1].legend()
+    axes[1].set_title("Validation and Test Accuracy/BLEU") if test_history else axes[1].set_title("Validation Accuracy/BLEU")
+
+    plt.tight_layout()  # Adjust layout to prevent overlap
+
     plot_path = os.path.join(save_plots_dir, f'{model_type}_history.png')
-    print(plot_path)
     plt.savefig(plot_path, dpi=300)
-    # Close the plot to prevent it from displaying
     plt.close(fig)
 
 
