@@ -114,9 +114,9 @@ if __name__ == '__main__':
                                 collate_fn=mycollate,
                                 num_workers=training_args.cpu_num_workers,
                                 pin_memory=training_args.pin_memory)
-        metrics_dict = trainer.evaluate(test_loader)
+        metrics_dict = trainer.evaluate(test_loader, set_name='test')
         print(metrics_dict)
         print("evaluation Done.")
-        
+
     print(history)
-    # plot_loss(train_losses, valid_losses, steps, self.args.save_plots_dir, self.args.run_name)
+    # plot_loss(history, self.args.save_plots_dir, self.args.run_name)
