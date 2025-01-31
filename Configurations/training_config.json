@@ -11,7 +11,6 @@
     "run_name": "en-sp_transformer",
     "pin_memory": true,
     "warmup_steps": 1000,
-    "save_steps": 2500,
     "torch_compile": false,
     "eval_steps": 500,
     "lr_decay_ratio": 0.01

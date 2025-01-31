@@ -114,27 +114,18 @@ class Trainer():
                     metrics = self.evaluate()
                     for metric, value in metrics.items():
                         history[metric].append(value)
-                    print(f'\nValidation step-{step}: {metrics}')
+                    print(f'\n  Validation step-{step}: {metrics}')
                     # Check if the current BLEU score is better than or equal to the best BLEU score
                     if metrics['valid_bleu'] >= best_valid_bleu:
+                        print(f"    BLEU score improved from {best_valid_bleu} to {metrics['valid_bleu']}")
                         best_valid_bleu = metrics['valid_bleu']  # Update the best BLEU score
                         # Save the model checkpoint
-                        print(f'Saving model checkpoint at step-{step} with BLEU score: {best_valid_bleu}')
                         save_checkpoint(model=self.model,
                                         optimizer=optimizer,
                                         save_dir=self.args.save_models_dir,
                                         run_name=self.args.run_name,
                                         in_onnx=self.args.onnx)
                     self.model = self.model.train()
-                
-            # # Save model at specific intervals
-            # if self.args.save_steps != 0 and self.args.save_steps is not None:
-            #     if step % self.args.save_steps == 0 or step == self.args.max_steps:
-            #         save_checkpoint(model=self.model,
-            #                         optimizer=optimizer,
-            #                         save_dir=self.args.save_models_dir,
-            #                         run_name=self.args.run_name,
-            #                         in_onnx=self.args.onnx)
 
         tqdm_loop.close()
         print("Model Training Done.")

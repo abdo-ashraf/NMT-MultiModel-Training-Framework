@@ -66,8 +66,8 @@ class TrainingArguments:
         self.warmup_steps = config.get("warmup_steps")
         assert isinstance(self.warmup_steps, int), "warmup_steps must be an integer."
 
-        self.save_steps = config.get("save_steps")
-        assert isinstance(self.save_steps, int), "save_steps must be an integer."
+        # self.save_steps = config.get("save_steps")
+        # assert isinstance(self.save_steps, int), "save_steps must be an integer."
 
         self.eval_steps = config.get("eval_steps")
         assert isinstance(self.eval_steps, int), "eval_steps must be an integer."
@@ -101,7 +101,7 @@ class TrainingArguments:
                 f"  run_name='{self.run_name}',\n" +
                 f"  pin_memory={self.pin_memory},\n" +
                 f"  warmup_steps={self.warmup_steps},\n" +
-                f"  save_steps={self.save_steps},\n" +
+                # f"  save_steps={self.save_steps},\n" +
                 f"  eval_steps={self.eval_steps},\n" +
                 f"  torch_compile={self.torch_compile}\n" +
                 f"  lr_decay_ratio={self.lr_decay_ratio}\n" +
