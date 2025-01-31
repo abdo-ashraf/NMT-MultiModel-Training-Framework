@@ -8,6 +8,7 @@ setup:
 	pip install -r requirements.txt
 
 data:
+# Check for required parameters
 	@if [ -z "$(data_type)" ]; then \
 		echo "Error: data_type is required. Available data types: 1:'ar-en', 2:'sp-en'"; \
 		exit 1; \
@@ -38,36 +39,55 @@ data:
 
 
 tokenizer:
-	@if [ -z "$(train_csv_path)" ]; then \
-		echo "Error: train_csv_path is required."; \
-		exit 1; \
-	fi
+# Check for required parameters
+	@for var in train_csv_path train_col1 train_col2 tokenizer_config_path out_dir; do \
+		if [ -z "$$$$var" ]; then \
+			echo "Error: $$$$var is required."; \
+			exit 1; \
+		fi \
+	done
 
-	@if [ -z "$(train_col1)" ]; then \
-		echo "Error: train_col1 is required."; \
-		exit 1; \
-	fi
-
-	@if [ -z "$(train_col2)" ]; then \
-		echo "Error: train_col1 is required."; \
-		exit 1; \
-	fi
-
-	@if [ -z "$(tokenizer_config_path)" ]; then \
-		echo "Error: tokenizer_config_path is required."; \
-		exit 1; \
-	fi
-
-	@if [ -z "$(out_dir)" ]; then \
-		echo "Error: out_dir is required."; \
-		exit 1; \
-	fi
-
-	@echo "Making tokenizer at $(out_dir)/tokenizers/ with configurations at $(tokenizer_config_path) on Columns '$(train_col1)', '$(train_col2)' of $(train_csv_path) csv"; \
-	python ./Tokenizers/tokenizers_workflow.py \
+	@echo "Making tokenizer at $(out_dir)/tokenizers/ ";
+	@echo "with configurations at $(tokenizer_config_path) ";
+	@echo "on Columns '$(train_col1)', '$(train_col2)' ";
+	@echo "of $(train_csv_path) csv.";
+	@python ./Tokenizers/tokenizers_workflow.py \
 		--train_csv_path $(train_csv_path) \
 		--train_on_columns $(train_col1) $(train_col2) \
 		--config_path $(tokenizer_config_path) \
 		--out_dir $(out_dir)
 
 model:
+# Check for required parameters
+	@for var in train_csv_path valid_csv_path source_column_name target_column_name tokenizer_path model_config_path training_config_path out_dir model_type; do \
+		if [ -z "$$$$var" ]; then \
+			echo "Error: $$$$var is required."; \
+			exit 1; \
+		fi \
+	done
+
+# Set default for optional test_csv_path if not provided
+	test_csv_path ?= None
+
+	@echo "Making $(model_type) model at $(out_dir)/models/ with ";
+	@echo "train_csv_path=$(train_csv_path) ";
+	@echo "valid_csv_path=$(valid_csv_path) ";
+	@echo "test_csv_path=$(test_csv_path) ";
+	@echo "source_column_name=$(source_column_name) ";
+	@echo "target_column_name=$(target_column_name) ";
+	@echo "tokenizer_path=$(tokenizer_path) ";
+	@echo "model_config_path=$(model_config_path) ";
+	@echo "training_config_path=$(training_config_path) ";
+	@echo "out_dir=$(out_dir) ";
+	@echo "model_type=$(model_type) ";
+	@python ./workflow.py \
+		--train_csv_path $(train_csv_path) \
+		--valid_csv_path $(valid_csv_path) \
+		--test_csv_path $(test_csv_path) \
+		--source_column_name $(source_column_name) \
+		--target_column_name $(target_column_name) \
+		--tokenizer_path $(tokenizer_path) \
+		--model_config_path $(model_config_path) \
+		--training_config_path $(training_config_path) \
+		--out_dir $(out_dir) \
+		--model_type $(model_type)
