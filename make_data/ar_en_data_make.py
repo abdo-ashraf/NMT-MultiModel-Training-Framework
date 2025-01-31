@@ -136,7 +136,7 @@ def post_plot(plots_dir, filtered_data):
     # Close the plot to prevent it from displaying
     plt.close(fig)
 
-def ar_en_data(data_dir, plots_dir, data_type, maxlen, valid_test_split, seed):
+def ar_en_data(data_dir, plots_dir, maxlen, valid_test_split, seed):
 
     df_data = download_data()
     df_data['en'] = df_data['en'].apply(clean_en)
