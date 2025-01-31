@@ -3,7 +3,7 @@
     "max_steps": 6000,
     "seed": 123,
     "precision": "high",
-    "device": "cpu",
+    "device": "cuda",
     "batch_size": 128,
     "cpu_num_workers": 4,
     "weight_decay": 1e-05,
