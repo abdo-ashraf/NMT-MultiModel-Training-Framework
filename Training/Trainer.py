@@ -1,7 +1,7 @@
 import torch
 from tqdm import tqdm
 from .TrainingArguments import TrainingArguments
-from utils import MT_Dataset, MyCollate, save_checkpoint, plot_loss, CosineScheduler
+from utils import MT_Dataset, MyCollate, save_checkpoint, CosineScheduler
 from torch.utils.data import DataLoader
 from collections import defaultdict
 

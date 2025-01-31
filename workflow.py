@@ -7,9 +7,8 @@ from Models.ModelArgs import ModelArgs
 import os
 import argparse
 import sys
-import torch
 from torch.utils.data import DataLoader
-from utils import MT_Dataset, MyCollate, compute_metrics, get_parameters_info
+from utils import MT_Dataset, MyCollate, compute_metrics, get_parameters_info, plot_history
 # import onnx
 
 ## Data params: train_csv_path, valid_csv_path, batch_size, num_workers, seed, device, out_dir, maxlen
@@ -114,9 +113,11 @@ if __name__ == '__main__':
                                 collate_fn=mycollate,
                                 num_workers=training_args.cpu_num_workers,
                                 pin_memory=training_args.pin_memory)
-        metrics_dict = trainer.evaluate(dataloader=test_loader, set_name='test')
-        print(metrics_dict)
+        test_metrics = trainer.evaluate(dataloader=test_loader, set_name='test')
+        print(test_metrics)
         print("evaluation Done.")
 
-    print(history)
-    # plot_loss(history, self.args.save_plots_dir, self.args.run_name)
+    
+    save_plots_dir = os.path.join(args.out_dir, 'plots')
+    os.makedirs(save_plots_dir, exist_ok=True)
+    plot_history(history, save_plots_dir, model_args.model_type)

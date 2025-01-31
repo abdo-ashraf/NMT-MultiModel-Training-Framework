@@ -6,7 +6,6 @@ from Tokenizers.Tokenizers import Callable_tokenizer
 import matplotlib.pyplot as plt
 import os
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-from sklearn.metrics import accuracy_score
 
 
 ## Dataset
@@ -84,15 +83,17 @@ def get_parameters_info(model):
     return names, trainable, nontrainable
 
 
-def plot_loss(train_class_losses, val_class_losses, steps, plots_dir, model_name):
+def plot_history(history, save_plots_dir, model_type):
 
     fig = plt.figure(figsize=(8, 3))
-    plt.plot(steps, train_class_losses, label="Training Loss")
-    plt.plot(steps, val_class_losses, label="Validation Loss")
+    plt.plot(history['steps'], history['train_loss'], label="Training Loss")
+    plt.plot(history['steps'], history['valid_loss'], label="Validation Loss")
+    plt.plot(history['steps'], history['valid_accuracy'], label="Validation Accuracy")
+    plt.plot(history['steps'], history['valid_bleu'], label="Validation Bleu")
     plt.xlabel("Step")
-    plt.ylabel("Loss")
+    plt.ylabel("Scores")
     plt.legend()  # Add a legend to differentiate the lines
-    plot_path = os.path.join(plots_dir, f'{model_name}_losses.png')
+    plot_path = save_plots_dir+f'{model_type}_history.png'
     plt.savefig(plot_path, dpi=300)
     # Close the plot to prevent it from displaying
     plt.close(fig)

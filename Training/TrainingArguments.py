@@ -26,9 +26,9 @@ class TrainingArguments:
         os.makedirs(self.save_models_dir, exist_ok=True)
         assert os.path.exists(self.save_models_dir), f"{self.save_models_dir} : output directory not found."
 
-        self.save_plots_dir = os.path.join(out_dir, 'plots')
-        os.makedirs(self.save_plots_dir, exist_ok=True)
-        assert os.path.exists(self.save_plots_dir), f"{self.save_plots_dir} : Plot directory not found."
+        # self.save_plots_dir = os.path.join(out_dir, 'plots')
+        # os.makedirs(self.save_plots_dir, exist_ok=True)
+        # assert os.path.exists(self.save_plots_dir), f"{self.save_plots_dir} : Plot directory not found."
 
         self.learning_rate = config.get("learning_rate")
         assert isinstance(self.learning_rate, float), "learning_rate must be a float."
@@ -88,7 +88,7 @@ class TrainingArguments:
         """
         return ("TrainingArguments(\n" +
                 f"  save_models_dir='{self.save_models_dir}',\n" +
-                f"  save_plots_dir='{self.save_plots_dir}',\n" +
+                # f"  save_plots_dir='{self.save_plots_dir}',\n" +
                 f"  learning_rate={self.learning_rate},\n" +
                 f"  max_steps={self.max_steps},\n" +
                 f"  seed={self.seed},\n" +
