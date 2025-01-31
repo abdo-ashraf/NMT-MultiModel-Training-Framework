@@ -21,7 +21,7 @@ def parse_arguments():
 
     parser.add_argument('--train_csv_path', type=str, required=True, help='CSV of columns for train')
     parser.add_argument('--valid_csv_path', type=str, required=True, help='CSV of columns for validation')
-    parser.add_argument('--test_csv_path', default=None, type=str, required=False, help='CSV of columns for Testing')
+    parser.add_argument('--test_csv_path', default='None', type=str, required=False, help='CSV of columns for Testing')
     parser.add_argument('--source_column_name', type=str, required=True, help='source_column_name')
     parser.add_argument('--target_column_name', type=str, required=True, help='target_column_name')
     parser.add_argument('--tokenizer_path', type=str, required=True, help='A path of tokenizer.model')
@@ -47,6 +47,11 @@ if __name__ == '__main__':
     assert os.path.exists(args.tokenizer_path), f"{args.tokenizer_path} : Tokenizer.model not found."
     assert os.path.exists(args.model_config_path), f"{args.model_config_path} : Model configuration file not found."
     assert os.path.exists(args.training_config_path), f"{args.training_config_path} : Training configuration file not found."
+    test_csv_path = args.test_csv_path
+    if not os.path.exists(test_csv_path):
+        print(f"Test csv path: {test_csv_path} does not exists test_csv_path will set to None")
+        test_csv_path = None
+
     os.makedirs(args.out_dir, exist_ok=True)
 
     print("---------------------Starting Tokenizer Loading...---------------------")
@@ -103,9 +108,9 @@ if __name__ == '__main__':
     print(f"Training Done.")
 
     test_metrics=None
-    if args.test_csv_path is not None:
+    if test_csv_path is not None:
         print("---------------------Start evaluation on test-set...---------------------")
-        test_df = pd.read_csv(args.test_csv_path)
+        test_df = pd.read_csv(test_csv_path)
         test_ds = MT_Dataset(input_sentences_list=test_df[args.source_column_name].to_list(),
                             target_sentences_list=test_df[args.target_column_name].to_list(),
                             callable_tokenizer=tokenizer)
