@@ -19,7 +19,7 @@ Future Work for the Project
     6. Experiment Tracking:
         - Integrate MLflow for experimental tracking, providing better insights into training, validation, and hyperparameter tuning.
 
-    7. Test Set Evaluation:
+    7. (Done) Test Set Evaluation:
         - Add functionality for evaluation of the model on a test set to ensure performance consistency.
 
     8. Inference Improvements:
@@ -34,3 +34,5 @@ Future Work for the Project
     11. Models Deployment:
         - Include utilities for exporting and deploying models.
 
+    12. (Done) Makefile:
+        - write a makefile for the project.
