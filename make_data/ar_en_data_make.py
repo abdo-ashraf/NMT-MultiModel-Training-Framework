@@ -152,9 +152,9 @@ def ar_en_data(data_dir, plots_dir, maxlen, valid_test_split, seed):
     df_valid, df_test = train_test_split(df_test, test_size=0.5, shuffle=True, random_state=seed)
     print(df_train.shape, df_test.shape, df_valid.shape, sep=', ')
 
-    df_train.to_csv(os.path.join(data_dir,'ar-en_train.csv'), index=False)
-    df_valid.to_csv(os.path.join(data_dir,'ar-en_valid.csv'), index=False)
-    df_test.to_csv(os.path.join(data_dir,'ar-en_test.csv'), index=False)
+    df_train.to_csv(os.path.join(data_dir,'en-ar_train.csv'), index=False)
+    df_valid.to_csv(os.path.join(data_dir,'en-ar_valid.csv'), index=False)
+    df_test.to_csv(os.path.join(data_dir,'en-ar_test.csv'), index=False)
 
     return df_train, df_valid, df_test
 
