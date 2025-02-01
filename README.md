@@ -166,7 +166,7 @@ Adjust these parameters based on your dataset size, computational resources, and
 
 ---
 
-## Model Training Comparison
+## Models Training Comparison
 
 The following plots illustrate the training performance for each architecture:
 
