@@ -8,7 +8,7 @@
     "cpu_num_workers": 4,
     "weight_decay": 1e-05,
     "onnx": false,
-    "run_name": "en-ar_s2sAttention",
+    "run_name": "en-ar_s2s",
     "pin_memory": true,
     "warmup_steps": 1000,
     "torch_compile": false,
