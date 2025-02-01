@@ -38,9 +38,9 @@ transformer.to(device)
 
 def lunch(raw_input, maxtries=50):
     transformer_out = en_translate_ar(raw_input, transformer, tokenizer, maxtries)
-    s2s_out = en_translate_ar(raw_input, s2s, tokenizer, maxtries)
     s2sattention_out = en_translate_ar(raw_input, s2sattention, tokenizer, maxtries)
-    return transformer_out, s2s_out, s2sattention_out
+    s2s_out = en_translate_ar(raw_input, s2s, tokenizer, maxtries)
+    return transformer_out, s2sattention_out, s2s_out, 
 
 
 custom_css ='.gr-button {background-color: #bf4b04; color: white;}'
