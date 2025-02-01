@@ -199,4 +199,17 @@ You can try the three different NMT models (Transformer, Seq2Seq, and Seq2Seq wi
 
 If you're encountering issues that are not listed here, please check the [issues page](https://github.com/abdo-ashraf/NMT-MultiModel-Training-Framework/issues) for more information or open a new issue.
 
+## Citations
+
+1. **Transformer Model**: 
+   Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. *arXiv preprint arXiv:1706.03762*. 
+   [Link to Paper](https://arxiv.org/abs/1706.03762)
+
+2. **Seq2Seq Model**:
+   Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. *arXiv preprint arXiv:1409.3215*.
+   [Link to Paper](https://arxiv.org/abs/1409.3215)
+
+3. **Seq2Seq with Attention Model**:
+   Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. *arXiv preprint arXiv:1409.3215*.
+   [Link to Paper](https://arxiv.org/abs/1409.3215)
 
