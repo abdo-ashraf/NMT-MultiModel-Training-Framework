@@ -166,21 +166,37 @@ Adjust these parameters based on your dataset size, computational resources, and
 
 ## Model Training Comparison
 
-   After training the models with the same configurations, the following plots illustrate the training performance for each architecture:
+The following plots illustrate the training performance for each architecture:
 
-   ### Transformer Model
-   ![Training Loss vs Epochs (Transformer)](out/plots/en-ar_transformer_history.png)
+### Transformer Model
+![Training Loss vs Epochs (Transformer)](out/plots/en-ar_transformer_history.png)
+
+The plot above shows the training loss, validation loss, and testing metrics for the Transformer model across steps.
+
+### Seq2Seq Model
+![Training Loss vs Epochs (Seq2Seq)](out/plots/en-ar_s2s_history.png)
+
+This plot demonstrates the training performance of the Seq2Seq model.
+
+### Seq2Seq with Attention Model
+![Training Loss vs Epochs (Seq2Seq with Attention)](out/plots/en-ar_s2sAttention_history.png)
+
+This plot highlights the Seq2Seq model's performance with an attention mechanism.
    
-   The plot above shows the training, validation and testing loss and metrics for the Transformer model over the course of training.
-   
-   ### Seq2Seq Model
-   ![Training Loss vs Epochs (Seq2Seq)](out/plots/en-ar_s2s_history.png)
-   
-   The plot above shows the training, validation and testing loss and metrics for the Seq2Seq model.
-   
-   ### Seq2Seq with Attention Model
-   ![Training Loss vs Epochs (Seq2Seq with Attention)](out/plots/en-ar_s2sAttention_history.png)
-   
-   The plot above shows the training, validation and testing loss and metrics for the Seq2Seq model with Attention.
-   
-## Deployment Link for: https://huggingface.co/spaces/TheDemond/Neural-machine-translation
+## Deployment
+
+You can try the three different NMT models (Transformer, Seq2Seq, and Seq2Seq with Attention) deployed at the following link:
+
+[Neural Machine Translation on Hugging Face](https://huggingface.co/spaces/TheDemond/Neural-machine-translation)
+
+## Troubleshooting
+
+- **Issue: Training fails due to memory issues**  
+  Solution: Try reducing the batch size in the `training_config.json` file.
+
+- **Issue: Data preprocessing errors**  
+  Solution: Ensure the columns in your CSV file are correctly named according to the `train_col1` and `train_col2` parameters in the `tokenizer` and `training` commands.
+
+If you're encountering issues that are not listed here, please check the [issues page](https://github.com/abdo-ashraf/NMT-MultiModel-Training-Framework/issues) for more information or open a new issue.
+
+
