@@ -164,6 +164,8 @@ Adjust these parameters based on your dataset size, computational resources, and
       - `s2sAttention` for Seq2Seq models with attention mechanism.
    - `test_csv_path`: (Optional) Path to the test dataset (CSV file) used for evaluation after the training process.
 
+---
+
 ## Model Training Comparison
 
 The following plots illustrate the training performance for each architecture:
@@ -182,12 +184,16 @@ This plot demonstrates the training performance of the Seq2Seq model.
 ![Training Loss vs Epochs (Seq2Seq with Attention)](out/plots/en-ar_s2sAttention_history.png)
 
 This plot highlights the Seq2Seq model's performance with an attention mechanism.
-   
+ 
+---
+  
 ## Deployment
 
 You can try the three different NMT models (Transformer, Seq2Seq, and Seq2Seq with Attention) deployed at the following link:
 
 [Neural Machine Translation on Hugging Face](https://huggingface.co/spaces/TheDemond/Neural-machine-translation)
+
+---
 
 ## Troubleshooting
 
@@ -198,6 +204,8 @@ You can try the three different NMT models (Transformer, Seq2Seq, and Seq2Seq wi
   Solution: Ensure the columns in your CSV file are correctly named according to the `train_col1` and `train_col2` parameters in the `tokenizer` and `training` commands.
 
 If you're encountering issues that are not listed here, please check the [issues page](https://github.com/abdo-ashraf/NMT-MultiModel-Training-Framework/issues) for more information or open a new issue.
+
+---
 
 ## Future Work
 
@@ -218,6 +226,8 @@ There are several key areas we plan to improve and expand in the future to make 
 
 5. **Inference Improvements**:
    - Implement **beam search decoding** during inference to enhance translation quality and produce more accurate outputs by considering multiple possible translations.
+
+---
 
 ## Citations
 
