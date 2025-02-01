@@ -50,7 +50,9 @@ with gr.Blocks(css=custom_css) as demo:
             input_text = gr.Textbox(label='English Sentence')
             gr.Examples(['How are you?',
                          'She is a good girl.',
-                         'Who is better than me?!'],
+                         'Who is better than me?!',
+                         'is tom looking at me?',
+                         'when was the last time we met?'],
                         inputs=input_text, label="Examples: ")
         with gr.Column():
             output1 = gr.Textbox(label="Arabic Transformer Translation")
