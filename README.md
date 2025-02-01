@@ -199,6 +199,26 @@ You can try the three different NMT models (Transformer, Seq2Seq, and Seq2Seq wi
 
 If you're encountering issues that are not listed here, please check the [issues page](https://github.com/abdo-ashraf/NMT-MultiModel-Training-Framework/issues) for more information or open a new issue.
 
+## Future Work
+
+There are several key areas we plan to improve and expand in the future to make this framework even more efficient and flexible:
+
+1. **Improve Model Compilation**:
+   - Resolve issues with `torch.compile` when enabled to fully leverage PyTorch’s optimized compilation pipeline for faster training and inference.
+
+2. **Optimize Transformer Models**:
+   - **Flash Attention**: Add support for Flash Attention to enhance the efficiency and speed of transformer-based models, especially on large datasets and high-resource hardware.
+   - **Pretrained Models**: Integrate pretrained models like Marain-MT for AraBert to further improve performance, especially for Arabic language tasks.
+
+3. **ONNX Model Support**:
+   - Enable saving models in ONNX format when `in_onnx` is set to `True`, allowing for seamless deployment across different platforms, including cloud environments and edge devices.
+
+4. **Experiment Tracking**:
+   - Integrate **MLflow** for better experiment tracking, providing richer insights into model training, validation, and hyperparameter tuning. This will allow for more systematic comparisons and reproducibility across runs.
+
+5. **Inference Improvements**:
+   - Implement **beam search decoding** during inference to enhance translation quality and produce more accurate outputs by considering multiple possible translations.
+
 ## Citations
 
 1. **Transformer Model**: 
