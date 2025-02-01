@@ -1,6 +1,7 @@
 /__pycache__/
 */__pycache__/*
-/out/
+/out/data
+/out/models
 __pycache__/
 *.py[cod]
 *$py.class
