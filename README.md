@@ -1,3 +1,15 @@
+## Table of Contents
+
+1. [Introduction](#nmt-multimodel-training-framework)
+2. [Features](#features)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [Models Training Comparison](#models-training-comparison)
+6. [Deployment](#deployment)
+7. [Troubleshooting](#troubleshooting)
+8. [Future Work](#future-work)
+9. [Citations](#citations)
+
 # NMT-MultiModel-Training-Framework
 **NMT-MultiModel-Training-Framework** is a versatile and scalable framework designed for training and evaluating Neural Machine Translation (NMT) models using multiple architectures. This framework supports various NMT models, including but not limited to Seq2Seq, Transformer, and Attention-based models. It is built to facilitate easy experimentation, customization, and deployment of NMT systems.
 
