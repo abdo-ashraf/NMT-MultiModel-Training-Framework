@@ -203,7 +203,7 @@ This plot highlights the Seq2Seq model's performance with an attention mechanism
 
 You can try the three different NMT models (Transformer, Seq2Seq, and Seq2Seq with Attention) deployed at the following link:
 
-[Neural Machine Translation on Hugging Face](https://huggingface.co/spaces/TheDemond/Neural-machine-translation)
+[Neural Machine Translation on Hugging Face](https://huggingface.co/spaces/TheDemond/Neural-machine-translation-app)
 
 ---
 
